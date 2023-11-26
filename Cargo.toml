@@ -1,0 +1,16 @@
+[package]
+name = "anki_srs_kai"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+lto = true
+
+[dependencies]
+js-sys = { version = "0.3.66", default-features = false }
+serde = { version = "1.0.193", default-features = false, features = ["derive"] }
+serde-wasm-bindgen = { version = "0.6.3", default-features = false }
+wasm-bindgen = { version = "0.2.89", default-features = false }
