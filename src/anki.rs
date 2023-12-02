@@ -120,6 +120,9 @@ pub mod javascript {
     extern "C" {
         pub type ReviewState;
 
+        #[wasm_bindgen(method, setter, js_name = scheduledDays)]
+        pub fn set_scheduled_days(this: &ReviewState, scheduled_days: u32);
+
         // Anki encodes this as f32 but since all numbers are f64 in JavaScript, we
         // use f64 instead to avoid loss of precision when we cross the Rust and
         // JavaScript boundary

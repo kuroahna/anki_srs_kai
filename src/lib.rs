@@ -7,14 +7,17 @@ use wasm_bindgen::JsValue;
 use crate::anki::javascript::{CONTEXT, CUSTOM_DATA, STATES};
 use crate::anki::{FilteredState, NormalState, SchedulingStateKind, SchedulingStates};
 use crate::ease_reward::EaseReward;
+use crate::scheduler::Scheduler;
 
 mod anki;
 mod ease_reward;
+mod scheduler;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeckOptions {
     ease_reward: EaseReward,
+    scheduler: Scheduler,
 }
 
 #[wasm_bindgen(js_name = calculateNextCardStates)]
@@ -34,25 +37,41 @@ pub fn calculate_next_card_states(
 
     let states: SchedulingStates = serde_wasm_bindgen::from_value(states)?;
 
-    match states.current.kind {
-        SchedulingStateKind::Normal(normal) => match normal {
-            // We don't want to affect cards that are in Relearning state
-            // because we want to keep Anki's "New Interval" setting behaviour
-            NormalState::New(_) | NormalState::Learning(_) | NormalState::Relearning(_) => {
-                return Ok(JsValue::NULL)
-            }
-            NormalState::Review(_) => {}
-        },
-        SchedulingStateKind::Filtered(filtered) => match filtered {
-            FilteredState::Preview(_) => return Ok(JsValue::NULL),
-            FilteredState::Rescheduling(rescheduling) => match rescheduling.original_state {
+    let (current_scheduled_days, current_elapsed_days, current_ease_factor) =
+        match states.current.kind {
+            SchedulingStateKind::Normal(normal) => match normal {
+                // We don't want to affect cards that are in Relearning state
+                // because we want to keep Anki's "New Interval" setting behaviour
                 NormalState::New(_) | NormalState::Learning(_) | NormalState::Relearning(_) => {
                     return Ok(JsValue::NULL)
                 }
-                NormalState::Review(_) => {}
+                NormalState::Review(review) => (
+                    review.scheduled_days,
+                    review.elapsed_days,
+                    review.ease_factor,
+                ),
             },
-        },
-    };
+            SchedulingStateKind::Filtered(filtered) => match filtered {
+                FilteredState::Preview(_) => return Ok(JsValue::NULL),
+                FilteredState::Rescheduling(rescheduling) => match rescheduling.original_state {
+                    NormalState::New(_) | NormalState::Learning(_) | NormalState::Relearning(_) => {
+                        return Ok(JsValue::NULL)
+                    }
+                    NormalState::Review(review) => (
+                        review.scheduled_days,
+                        review.elapsed_days,
+                        review.ease_factor,
+                    ),
+                },
+            },
+        };
+
+    let next_states = deck_options.scheduler.next_states(
+        CONTEXT.seed(),
+        current_scheduled_days,
+        current_elapsed_days,
+        current_ease_factor,
+    );
 
     match states.again.kind {
         SchedulingStateKind::Normal(normal) => match normal {
@@ -76,6 +95,42 @@ pub fn calculate_next_card_states(
         },
     };
 
+    match states.hard.kind {
+        SchedulingStateKind::Normal(normal) => match normal {
+            NormalState::New(_) => {}
+            NormalState::Learning(_) => {}
+            NormalState::Review(_) => {
+                if let Some(hard_interval) = next_states.hard_interval {
+                    STATES
+                        .hard()
+                        .normal()
+                        .review()
+                        .set_scheduled_days(hard_interval);
+                }
+            }
+            NormalState::Relearning(_) => {}
+        },
+        SchedulingStateKind::Filtered(filtered) => match filtered {
+            FilteredState::Preview(_) => {}
+            FilteredState::Rescheduling(rescheduling) => match rescheduling.original_state {
+                NormalState::New(_) => {}
+                NormalState::Learning(_) => {}
+                NormalState::Review(_) => {
+                    if let Some(hard_interval) = next_states.hard_interval {
+                        STATES
+                            .hard()
+                            .filtered()
+                            .rescheduling()
+                            .original_state()
+                            .review()
+                            .set_scheduled_days(hard_interval)
+                    }
+                }
+                NormalState::Relearning(_) => {}
+            },
+        },
+    };
+
     match states.good.kind {
         SchedulingStateKind::Normal(normal) => match normal {
             NormalState::New(_) => {}
@@ -90,6 +145,14 @@ pub fn calculate_next_card_states(
                     ),
                 );
                 CUSTOM_DATA.good().set_c(Some(number_of_successful_reviews));
+
+                if let Some(good_interval) = next_states.good_interval {
+                    STATES
+                        .good()
+                        .normal()
+                        .review()
+                        .set_scheduled_days(good_interval);
+                }
             }
             NormalState::Relearning(_) => {}
         },
@@ -112,6 +175,16 @@ pub fn calculate_next_card_states(
                             review.ease_factor,
                         ));
                     CUSTOM_DATA.good().set_c(Some(number_of_successful_reviews));
+
+                    if let Some(good_interval) = next_states.good_interval {
+                        STATES
+                            .good()
+                            .filtered()
+                            .rescheduling()
+                            .original_state()
+                            .review()
+                            .set_scheduled_days(good_interval)
+                    }
                 }
                 NormalState::Relearning(_) => {}
             },
@@ -132,6 +205,14 @@ pub fn calculate_next_card_states(
                     ),
                 );
                 CUSTOM_DATA.easy().set_c(Some(number_of_successful_reviews));
+
+                if let Some(easy_interval) = next_states.easy_interval {
+                    STATES
+                        .easy()
+                        .normal()
+                        .review()
+                        .set_scheduled_days(easy_interval);
+                }
             }
             NormalState::Relearning(_) => {}
         },
@@ -154,6 +235,16 @@ pub fn calculate_next_card_states(
                             review.ease_factor,
                         ));
                     CUSTOM_DATA.easy().set_c(Some(number_of_successful_reviews));
+
+                    if let Some(easy_interval) = next_states.easy_interval {
+                        STATES
+                            .easy()
+                            .filtered()
+                            .rescheduling()
+                            .original_state()
+                            .review()
+                            .set_scheduled_days(easy_interval)
+                    }
                 }
                 NormalState::Relearning(_) => {}
             },

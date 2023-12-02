@@ -17,6 +17,20 @@ const deckOptions = {
             minimumEase: 1.30,
             maximumEase: 2.50,
         },
+        scheduler: {
+            enableFuzz: true,
+            maximumInterval: 36500,
+            intervalModifier: 1.00,
+            calculateHardMultiplier: (currentEaseFactor, currentInterval) => {
+                return 0.0;
+            },
+            calculateGoodMultiplier: (currentEaseFactor, currentInterval) => {
+                return currentEaseFactor / Math.pow(currentInterval, 0.054297);
+            },
+            calculateEasyMultiplier: (currentEaseFactor, currentInterval) => {
+                return 0.0;
+            },
+        },
     },
     \"Global Settings\": {
         easeReward: {
@@ -25,6 +39,22 @@ const deckOptions = {
             stepEaseReward: 0.05,
             minimumEase: 1.30,
             maximumEase: 2.50,
+        },
+        scheduler: {
+            enableFuzz: true,
+            maximumInterval: 36500,
+            intervalModifier: 1.00,
+            // Approximation of the default FSRS v4 parameters
+            // [0.4, 0.6, 2.4, 5.8, 4.93, 0.94, 0.86, 0.01, 1.49, 0.14, 0.94, 2.18, 0.05, 0.34, 1.26, 0.29, 2.61]
+            calculateHardMultiplier: (currentEaseFactor, currentInterval) => {
+                return (currentEaseFactor / Math.pow(currentInterval, 0.028372)) - 0.739;
+            },
+            calculateGoodMultiplier: (currentEaseFactor, currentInterval) => {
+                return (currentEaseFactor / Math.pow(currentInterval, 0.153776)) + 1.124;
+            },
+            calculateEasyMultiplier: (currentEaseFactor, currentInterval) => {
+                return (currentEaseFactor / Math.pow(currentInterval, 0.45)) + 5.348;
+            },
         },
     },
 };
