@@ -1,17 +1,17 @@
-[package]
-name = "anki_srs_kai"
-version = "0.1.0"
-edition = "2021"
-
-[lib]
-crate-type = ["cdylib"]
+[workspace]
+resolver = "2"
+members = ["anki_srs_kai", "xtask"]
 
 [profile.release]
 lto = true
 
-[dependencies]
-js-sys = { version = "0.3.66", default-features = false }
-rand = { version = "0.8.5", default-features = false, features = ["std_rng"] }
-serde = { version = "1.0.193", default-features = false, features = ["derive"] }
-serde-wasm-bindgen = { version = "0.6.3", default-features = false }
-wasm-bindgen = { version = "0.2.89", default-features = false }
+[workspace.package]
+version = "24.10.0"
+edition = "2021"
+authors = ["kuroahna"]
+repository = "https://github.com/kuroahna/anki_srs_kai"
+homepage = "https://github.com/kuroahna/anki_srs_kai"
+license = "AGPL-3.0-or-later"
+
+[workspace.metadata.crane]
+name = "anki_srs_kai"

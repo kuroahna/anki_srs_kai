@@ -332,6 +332,7 @@ fn get_fuzz_factor(seed: Option<u64>) -> Option<f64> {
 #[cfg(test)]
 mod tests {
     use crate::scheduler::{InternalScheduler, NextState};
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     #[derive(Default)]
     struct InternalSchedulerBuilder {
@@ -415,7 +416,7 @@ mod tests {
         }
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn default_anki_algorithm_is_used_for_early_reviews() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(true)
@@ -441,7 +442,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn disable_fuzz() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -467,7 +468,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn disable_fuzz_with_overdue_card() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -493,7 +494,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn enable_fuzz() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(true)
@@ -519,7 +520,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn intervals_do_not_exceed_maximum_interval() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -545,7 +546,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn interval_modifier_affects_all_intervals() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -571,7 +572,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn use_original_anki_algorithm_if_hard_multiplier_is_0() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -597,7 +598,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn use_original_anki_algorithm_if_good_multiplier_is_0() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -623,7 +624,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn use_original_anki_algorithm_if_easy_multiplier_is_0() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -649,7 +650,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn use_original_anki_algorithm_if_all_multipliers_are_0() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)

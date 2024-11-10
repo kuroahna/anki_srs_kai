@@ -89,6 +89,7 @@ impl EaseReward {
 #[cfg(test)]
 mod tests {
     use crate::ease_reward::EaseReward;
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     #[derive(Default)]
     struct EaseRewardBuilder {
@@ -140,7 +141,7 @@ mod tests {
         }
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn no_ease_reward_given_if_minimum_consecutive_successful_reviews_required_is_0() {
         let under_test = EaseRewardBuilder::default()
             .minimum_consecutive_successful_reviews_required_for_reward(0)
@@ -155,7 +156,7 @@ mod tests {
         assert_eq!(result, 2.0);
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn no_ease_reward_given_if_number_of_successes_is_below_minimum_required() {
         let under_test = EaseRewardBuilder::default()
             .minimum_consecutive_successful_reviews_required_for_reward(2)
@@ -170,7 +171,7 @@ mod tests {
         assert_eq!(result, 2.0);
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn ease_reward_added() {
         let under_test = EaseRewardBuilder::default()
             .minimum_consecutive_successful_reviews_required_for_reward(4)
@@ -185,7 +186,7 @@ mod tests {
         assert_eq!(result, 2.25);
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn ease_factor_is_rounded() {
         let under_test = EaseRewardBuilder::default()
             .minimum_consecutive_successful_reviews_required_for_reward(1)
@@ -200,7 +201,7 @@ mod tests {
         assert_eq!(result, 3.00);
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn ease_reward_greater_than_maximum_is_clamped_to_the_maximum() {
         let under_test = EaseRewardBuilder::default()
             .minimum_consecutive_successful_reviews_required_for_reward(4)
@@ -215,7 +216,7 @@ mod tests {
         assert_eq!(result, 2.70);
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn ease_reward_greater_than_absolute_maximum_is_clamped_to_the_absolute_maximum() {
         let under_test = EaseRewardBuilder::default()
             .minimum_consecutive_successful_reviews_required_for_reward(4)
@@ -230,7 +231,7 @@ mod tests {
         assert_eq!(result, 9.99);
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn no_ease_bonus_rewarded_if_ease_factor_is_already_above_maximum() {
         let under_test = EaseRewardBuilder::default()
             .minimum_consecutive_successful_reviews_required_for_reward(4)
@@ -245,7 +246,7 @@ mod tests {
         assert_eq!(result, 2.5);
     }
 
-    #[test]
+    #[wasm_bindgen_test]
     fn no_ease_bonus_rewarded_if_ease_factor_is_below_minimum() {
         let under_test = EaseRewardBuilder::default()
             .minimum_consecutive_successful_reviews_required_for_reward(4)

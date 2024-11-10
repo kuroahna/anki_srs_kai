@@ -1,13 +1,8 @@
-#!/bin/bash
+// Ideally, we would use the include_str!(...) macro but I can't figure out how
+// to get crane (nix library) to include js files in the source when
+// craneLib.buildDepsOnly is called
 
-if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
-    echo "usage: $0 PATH_TO_INPUT_WASM_FILE PATH_TO_INPUT_JS_FILE PATH_TO_OUTPUT_JS_FILE"
-    exit 1
-fi
-
-set -v
-
-echo "
+pub const HEADER: &str = r#"
 const deckOptions = {
     \"deck1\": {
         easeReward: {
@@ -58,11 +53,9 @@ const deckOptions = {
         },
     },
 };
-" | cat - "$2" > "$3"
+"#;
 
-WASM_BYTES=$(hexdump -v -e '/1 "%u\n"' "$1" | paste -s -d "," -)
-echo "
-const wasmBytes = new Uint8Array([${WASM_BYTES}]);
+pub const FOOTER: &str = r##"
 const response = new Response(
     wasmBytes,
     {
@@ -126,4 +119,4 @@ try {
 
     openCustomModal(e.message);
 }
-" >> "$3"
+"##;
