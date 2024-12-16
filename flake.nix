@@ -124,7 +124,7 @@
           };
           localDirectory = pkgs.lib.fileset.toSource {
             root = ./.;
-            fileset = ./AnkiDroid;
+            fileset = pkgs.lib.fileset.unions [ ./AnkiDroid ./addon/update_custom_data.sql ];
           };
           srcs = [
             finalAttrs.ankiDroidSource
@@ -161,7 +161,8 @@
           port = "5554";
 
           postUnpack = ''
-            cp -r source/* ${finalAttrs.pname}
+            cp -r source/AnkiDroid ${finalAttrs.pname}
+            cp source/addon/update_custom_data.sql ${finalAttrs.pname}/AnkiDroid/src/androidTest/assets
             cp ${finalAttrs.override_anki_srs_kai}/dist/anki_srs_kai.js ${finalAttrs.pname}/AnkiDroid/src/androidTest/assets
           '';
 
@@ -239,6 +240,8 @@
         # Then run tests with
         # nix build .#ankidroid
         packages.ankidroid = ankidroid;
+
+        devShells.addon = pkgs.mkShell { packages = with pkgs; [ black ]; };
       }
     );
 }
