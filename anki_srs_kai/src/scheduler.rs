@@ -108,6 +108,7 @@ struct InternalScheduler {
 }
 
 impl InternalScheduler {
+    #[allow(clippy::too_many_arguments)]
     fn new(
         enable_fuzz: bool,
         maximum_interval: u32,
@@ -416,7 +417,7 @@ mod tests {
         }
     }
 
-    #[wasm_bindgen_test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn default_anki_algorithm_is_used_for_early_reviews() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(true)
@@ -442,7 +443,7 @@ mod tests {
         );
     }
 
-    #[wasm_bindgen_test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn disable_fuzz() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -468,7 +469,7 @@ mod tests {
         );
     }
 
-    #[wasm_bindgen_test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn disable_fuzz_with_overdue_card() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -494,7 +495,7 @@ mod tests {
         );
     }
 
-    #[wasm_bindgen_test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn enable_fuzz() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(true)
@@ -520,7 +521,7 @@ mod tests {
         );
     }
 
-    #[wasm_bindgen_test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn intervals_do_not_exceed_maximum_interval() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -546,7 +547,7 @@ mod tests {
         );
     }
 
-    #[wasm_bindgen_test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn interval_modifier_affects_all_intervals() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -572,7 +573,7 @@ mod tests {
         );
     }
 
-    #[wasm_bindgen_test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn use_original_anki_algorithm_if_hard_multiplier_is_0() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -598,7 +599,7 @@ mod tests {
         );
     }
 
-    #[wasm_bindgen_test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn use_original_anki_algorithm_if_good_multiplier_is_0() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -624,7 +625,7 @@ mod tests {
         );
     }
 
-    #[wasm_bindgen_test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn use_original_anki_algorithm_if_easy_multiplier_is_0() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)
@@ -650,7 +651,7 @@ mod tests {
         );
     }
 
-    #[wasm_bindgen_test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn use_original_anki_algorithm_if_all_multipliers_are_0() {
         let under_test = InternalSchedulerBuilder::default()
             .enable_fuzz(false)

@@ -17,21 +17,27 @@ pub struct FsrsMemoryState {
     // Anki encodes this as f32 but since all numbers are f64 in JavaScript, we
     // use f64 instead to avoid loss of precision when we cross the Rust and
     // JavaScript boundary
+    #[allow(dead_code)]
     pub stability: f64,
+    #[allow(dead_code)]
     pub difficulty: f64,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NewState {
+    #[allow(dead_code)]
     pub position: u32,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LearnState {
+    #[allow(dead_code)]
     pub remaining_steps: u32,
+    #[allow(dead_code)]
     pub scheduled_secs: u32,
+    #[allow(dead_code)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub memory_state: Option<FsrsMemoryState>,
 }
@@ -45,8 +51,11 @@ pub struct ReviewState {
     // use f64 instead to avoid loss of precision when we cross the Rust and
     // JavaScript boundary
     pub ease_factor: f64,
+    #[allow(dead_code)]
     pub lapses: u32,
+    #[allow(dead_code)]
     pub leeched: bool,
+    #[allow(dead_code)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub memory_state: Option<FsrsMemoryState>,
 }
@@ -54,23 +63,30 @@ pub struct ReviewState {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RelearnState {
+    #[allow(dead_code)]
     pub learning: LearnState,
+    #[allow(dead_code)]
     pub review: ReviewState,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum NormalState {
+    #[allow(dead_code)]
     New(NewState),
+    #[allow(dead_code)]
     Learning(LearnState),
     Review(ReviewState),
+    #[allow(dead_code)]
     Relearning(RelearnState),
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PreviewState {
+    #[allow(dead_code)]
     pub scheduled_secs: u32,
+    #[allow(dead_code)]
     pub finished: bool,
 }
 
@@ -83,6 +99,7 @@ pub struct ReschedulingFilterState {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum FilteredState {
+    #[allow(dead_code)]
     Preview(PreviewState),
     Rescheduling(ReschedulingFilterState),
 }
@@ -99,6 +116,7 @@ pub enum SchedulingStateKind {
 pub struct SchedulingState {
     #[serde(flatten)]
     pub kind: SchedulingStateKind,
+    #[allow(dead_code)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_data: Option<String>,
 }
@@ -167,8 +185,9 @@ pub mod javascript {
 
     #[wasm_bindgen]
     extern "C" {
+        #[derive(Clone)]
         pub type SchedulingStates;
-        #[wasm_bindgen(js_name = states)]
+        #[wasm_bindgen(thread_local, js_name = states)]
         pub static STATES: SchedulingStates;
 
         #[wasm_bindgen(method, getter, js_name = hard)]
@@ -183,9 +202,10 @@ pub mod javascript {
 
     #[wasm_bindgen]
     extern "C" {
+        #[derive(Clone)]
         pub type SchedulingContext;
 
-        #[wasm_bindgen(js_name = ctx)]
+        #[wasm_bindgen(thread_local, js_name = ctx)]
         pub static CONTEXT: SchedulingContext;
 
         #[wasm_bindgen(method, getter, js_name = deckName)]
@@ -206,8 +226,9 @@ pub mod javascript {
 
     #[wasm_bindgen]
     extern "C" {
+        #[derive(Clone)]
         pub type CustomDataStates;
-        #[wasm_bindgen(js_name = customData)]
+        #[wasm_bindgen(thread_local, js_name = customData)]
         pub static CUSTOM_DATA: CustomDataStates;
 
         #[wasm_bindgen(method, getter, js_name = again)]

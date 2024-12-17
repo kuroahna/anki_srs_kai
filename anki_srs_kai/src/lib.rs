@@ -20,6 +20,18 @@ pub struct DeckOptions {
     scheduler: Scheduler,
 }
 
+fn get_context() -> anki::javascript::SchedulingContext {
+    CONTEXT.with(anki::javascript::SchedulingContext::clone)
+}
+
+fn get_states() -> anki::javascript::SchedulingStates {
+    STATES.with(anki::javascript::SchedulingStates::clone)
+}
+
+fn get_custom_data() -> anki::javascript::CustomDataStates {
+    CUSTOM_DATA.with(anki::javascript::CustomDataStates::clone)
+}
+
 #[wasm_bindgen(js_name = calculateNextCardStates)]
 pub fn calculate_next_card_states(
     deck_name_to_deck_options: JsValue,
@@ -27,7 +39,7 @@ pub fn calculate_next_card_states(
 ) -> Result<JsValue, JsValue> {
     let deck_name_to_deck_options: HashMap<String, DeckOptions> =
         serde_wasm_bindgen::from_value(deck_name_to_deck_options)?;
-    let deck_options = match deck_name_to_deck_options.get(CONTEXT.deck_name().as_str()) {
+    let deck_options = match deck_name_to_deck_options.get(get_context().deck_name().as_str()) {
         None => match deck_name_to_deck_options.get("Global Settings") {
             None => return Ok(JsValue::NULL),
             Some(deck_options) => deck_options,
@@ -67,7 +79,7 @@ pub fn calculate_next_card_states(
         };
 
     let next_states = deck_options.scheduler.next_states(
-        CONTEXT.seed(),
+        get_context().seed(),
         current_scheduled_days,
         current_elapsed_days,
         current_ease_factor,
@@ -79,7 +91,7 @@ pub fn calculate_next_card_states(
             NormalState::Learning(_) => {}
             NormalState::Review(_) => {}
             NormalState::Relearning(_) => {
-                CUSTOM_DATA.again().set_c(None);
+                get_custom_data().again().set_c(None);
             }
         },
         SchedulingStateKind::Filtered(filtered) => match filtered {
@@ -89,7 +101,7 @@ pub fn calculate_next_card_states(
                 NormalState::Learning(_) => {}
                 NormalState::Review(_) => {}
                 NormalState::Relearning(_) => {
-                    CUSTOM_DATA.again().set_c(None);
+                    get_custom_data().again().set_c(None);
                 }
             },
         },
@@ -101,7 +113,7 @@ pub fn calculate_next_card_states(
             NormalState::Learning(_) => {}
             NormalState::Review(_) => {
                 if let Some(hard_interval) = next_states.hard_interval {
-                    STATES
+                    get_states()
                         .hard()
                         .normal()
                         .review()
@@ -117,7 +129,7 @@ pub fn calculate_next_card_states(
                 NormalState::Learning(_) => {}
                 NormalState::Review(_) => {
                     if let Some(hard_interval) = next_states.hard_interval {
-                        STATES
+                        get_states()
                             .hard()
                             .filtered()
                             .rescheduling()
@@ -137,17 +149,19 @@ pub fn calculate_next_card_states(
             NormalState::Learning(_) => {}
             NormalState::Review(review) => {
                 let number_of_successful_reviews =
-                    CUSTOM_DATA.good().c().map_or_else(|| 1, |c| c + 1);
-                STATES.good().normal().review().set_ease_factor(
+                    get_custom_data().good().c().map_or_else(|| 1, |c| c + 1);
+                get_states().good().normal().review().set_ease_factor(
                     deck_options.ease_reward.calculate_new_ease_factor(
                         number_of_successful_reviews,
                         review.ease_factor,
                     ),
                 );
-                CUSTOM_DATA.good().set_c(Some(number_of_successful_reviews));
+                get_custom_data()
+                    .good()
+                    .set_c(Some(number_of_successful_reviews));
 
                 if let Some(good_interval) = next_states.good_interval {
-                    STATES
+                    get_states()
                         .good()
                         .normal()
                         .review()
@@ -163,8 +177,8 @@ pub fn calculate_next_card_states(
                 NormalState::Learning(_) => {}
                 NormalState::Review(review) => {
                     let number_of_successful_reviews =
-                        CUSTOM_DATA.good().c().map_or_else(|| 1, |c| c + 1);
-                    STATES
+                        get_custom_data().good().c().map_or_else(|| 1, |c| c + 1);
+                    get_states()
                         .good()
                         .filtered()
                         .rescheduling()
@@ -174,10 +188,12 @@ pub fn calculate_next_card_states(
                             number_of_successful_reviews,
                             review.ease_factor,
                         ));
-                    CUSTOM_DATA.good().set_c(Some(number_of_successful_reviews));
+                    get_custom_data()
+                        .good()
+                        .set_c(Some(number_of_successful_reviews));
 
                     if let Some(good_interval) = next_states.good_interval {
-                        STATES
+                        get_states()
                             .good()
                             .filtered()
                             .rescheduling()
@@ -197,17 +213,19 @@ pub fn calculate_next_card_states(
             NormalState::Learning(_) => {}
             NormalState::Review(review) => {
                 let number_of_successful_reviews =
-                    CUSTOM_DATA.easy().c().map_or_else(|| 1, |c| c + 1);
-                STATES.easy().normal().review().set_ease_factor(
+                    get_custom_data().easy().c().map_or_else(|| 1, |c| c + 1);
+                get_states().easy().normal().review().set_ease_factor(
                     deck_options.ease_reward.calculate_new_ease_factor(
                         number_of_successful_reviews,
                         review.ease_factor,
                     ),
                 );
-                CUSTOM_DATA.easy().set_c(Some(number_of_successful_reviews));
+                get_custom_data()
+                    .easy()
+                    .set_c(Some(number_of_successful_reviews));
 
                 if let Some(easy_interval) = next_states.easy_interval {
-                    STATES
+                    get_states()
                         .easy()
                         .normal()
                         .review()
@@ -223,8 +241,8 @@ pub fn calculate_next_card_states(
                 NormalState::Learning(_) => {}
                 NormalState::Review(review) => {
                     let number_of_successful_reviews =
-                        CUSTOM_DATA.easy().c().map_or_else(|| 1, |c| c + 1);
-                    STATES
+                        get_custom_data().easy().c().map_or_else(|| 1, |c| c + 1);
+                    get_states()
                         .easy()
                         .filtered()
                         .rescheduling()
@@ -234,10 +252,12 @@ pub fn calculate_next_card_states(
                             number_of_successful_reviews,
                             review.ease_factor,
                         ));
-                    CUSTOM_DATA.easy().set_c(Some(number_of_successful_reviews));
+                    get_custom_data()
+                        .easy()
+                        .set_c(Some(number_of_successful_reviews));
 
                     if let Some(easy_interval) = next_states.easy_interval {
-                        STATES
+                        get_states()
                             .easy()
                             .filtered()
                             .rescheduling()
