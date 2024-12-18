@@ -90,12 +90,12 @@
         };
 
         buildToolsVersion = "34.0.0";
-        platformVersion = "34";
+        platformVersion = "35";
         systemImageType = "google_apis";
         abiVersion = "x86_64";
         androidComposition = androidPkgs.androidenv.composeAndroidPackages {
           buildToolsVersions = [ buildToolsVersion ];
-          platformToolsVersion = "34.0.5";
+          platformToolsVersion = "35.0.2";
           platformVersions = [ platformVersion ];
           emulatorVersion = "35.2.5";
           includeEmulator = true;
@@ -112,14 +112,25 @@
 
         ankidroid = pkgs.stdenv.mkDerivation (finalAttrs: {
           pname = "AnkiDroid";
-          version = "v2.19.1";
+          version = "v2.20.0";
           strictDeps = true;
 
           ankiDroidSource = pkgs.fetchFromGitHub {
             owner = "ankidroid";
             repo = "Anki-Android";
             rev = "${finalAttrs.version}";
-            hash = "sha256-CHU2e4eRwTtTC6x61WnIwfvBvImO5jnAD8/hVC5LdWg=";
+            # IMPORTANT: To properly update the hash after updating the version
+            # above, first set the hash to an empty string (""), build the
+            # derivation, extract the calculated hash from the error message,
+            # and replace the hash below
+            #
+            # If only the version was updated and not the hash, the build will
+            # not fetch the new version or check that the hash has changed since
+            # it is a fixed output derivation
+            #
+            # https://nixos.org/manual/nixpkgs/unstable/index.html#chap-pkgs-fetchers-caveats
+            # https://nixos.org/manual/nixpkgs/unstable/index.html#sec-pkgs-fetchers-updating-source-hashes
+            hash = "sha256-Z3tr8ca+KmIqGpxLQJtoMZAyEtARux2oAhLleELyhKA=";
             name = finalAttrs.pname;
           };
           localDirectory = pkgs.lib.fileset.toSource {

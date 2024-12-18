@@ -684,11 +684,17 @@ const deckOptions = {
             .hasEaseFactor(2050)
             .hasReps(1)
             .hasCustomData("""{"test":100,"c":1}""")
+            // Although we set the difficulty and stability to 5.0 and 100.0 respectively, after
+            // answering good, new FSRS memory states are calculated using the default weights.
+            //
+            // Any time the default FSRS weights are updated, these values will change
+            //
+            // https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/answering/mod.rs#L433
             .hasMemoryState(
                 FsrsMemoryState
                     .newBuilder()
-                    .setDifficulty(5.0F)
-                    .setStability(100.0F)
+                    .setDifficulty(4.992F)
+                    .setStability(140.777F)
                     .build()
             )
             .hasDesiredRetention(0.90F)

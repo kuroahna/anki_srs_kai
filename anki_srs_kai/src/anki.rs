@@ -1,12 +1,12 @@
 use serde::Deserialize;
 
 // These structs have mainly been constructed by the protobuf messages defined
-// in Anki: https://github.com/ankitects/anki/blob/23.10.1/proto/anki/scheduler.proto#L68
+// in Anki: https://github.com/ankitects/anki/blob/24.11/proto/anki/scheduler.proto#L74
 //
 // However, to modify the custom data, we actually need to modify the customData
 // that gets passed in to the custom scheduler separately, rather than on the
 // SchedulingState itself
-// See: https://github.com/ankitects/anki/blob/23.10.1/ts/reviewer/answering.ts#L63
+// See: https://github.com/ankitects/anki/blob/24.11/ts/reviewer/answering.ts#L63
 //
 // Unfortunately, wasm-bindgen is not yet supported for prost, so we have to
 // manually write the structs ourselves
@@ -37,6 +37,8 @@ pub struct LearnState {
     pub remaining_steps: u32,
     #[allow(dead_code)]
     pub scheduled_secs: u32,
+    #[allow(dead_code)]
+    pub elapsed_secs: u32,
     #[allow(dead_code)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub memory_state: Option<FsrsMemoryState>,
@@ -214,12 +216,12 @@ pub mod javascript {
         // passed into us in the SchedulingContext
         //
         // They call
-        // (card.id.0 as u64).wrapping_add(card.reps as u64)
-        // https://github.com/ankitects/anki/blob/23.12beta1/rslib/src/scheduler/answering/mod.rs#L484
+        // (card_id.0 as u64).wrapping_add(card_reps as u64)
+        // https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/answering/mod.rs#L612
         //
         // But we actually get
         // (self.id.0 as u64).rotate_left(8).wrapping_add(self.reps as u64)
-        // https://github.com/ankitects/anki/blob/23.12beta1/rslib/src/card/mod.rs#L256
+        // https://github.com/ankitects/anki/blob/24.11/rslib/src/card/mod.rs#L257
         #[wasm_bindgen(method, getter, js_name = seed)]
         pub fn seed(this: &SchedulingContext) -> u64;
     }
@@ -251,7 +253,7 @@ pub mod javascript {
         // Custom data key names must be under 8 bytes (8 ASCII characters), so
         // we cannot provide more descriptive names. Also, the serialized JSON
         // must be under 100 bytes.
-        // See: https://github.com/ankitects/anki/blob/23.10.1/rslib/src/storage/card/data.rs#L119-L133
+        // See: https://github.com/ankitects/anki/blob/24.11/rslib/src/storage/card/data.rs#L119-L133
         #[wasm_bindgen(method, getter, js_name = c)]
         pub fn c(this: &CustomDataState) -> Option<u32>;
 

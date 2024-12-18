@@ -40,7 +40,7 @@ class AnkiSrsKaiTestUtils private constructor() {
         }
 
         private fun clickOnDeckWithName(deckName: String) {
-            onView(withId(R.id.files)).perform(
+            onView(withId(R.id.decks)).perform(
                 RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
                     hasDescendant(withText(deckName)),
                     click()
@@ -48,14 +48,8 @@ class AnkiSrsKaiTestUtils private constructor() {
             )
         }
 
-        private fun clickOnStudyButtonIfExists() {
-            onView(withId(R.id.studyoptions_start))
-                .withFailureHandler { _, _ -> }
-                .perform(click())
-        }
-
         fun reviewDeckWithName(deckName: String) {
-            onView(withId(R.id.files)).checkWithTimeout(matches(hasDescendant(withText(deckName))))
+            onView(withId(R.id.decks)).checkWithTimeout(matches(hasDescendant(withText(deckName))))
             clickOnDeckWithName(deckName)
         }
 
@@ -89,8 +83,8 @@ class AnkiSrsKaiTestUtils private constructor() {
         }
 
         fun rebuildFilteredDeck(deckName: String) {
-            onView(withId(R.id.files)).checkWithTimeout(matches(hasDescendant(withText(deckName))))
-            onView(withId(R.id.files)).perform(
+            onView(withId(R.id.decks)).checkWithTimeout(matches(hasDescendant(withText(deckName))))
+            onView(withId(R.id.decks)).perform(
                 RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
                     hasDescendant(withText(deckName)),
                     longClick()

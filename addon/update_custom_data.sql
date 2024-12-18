@@ -6,7 +6,7 @@ SET data = json_patch(
     json_object(
         -- Anki stores the customData in the cards table under the data column as a JSON string in
         -- the "cd" field
-        -- https://github.com/ankitects/anki/blob/23.10.1/rslib/src/storage/card/data.rs#L49
+        -- https://github.com/ankitects/anki/blob/24.11/rslib/src/storage/card/data.rs#L49
         'cd',
         -- Remove the single quotes introduced by calling quote
         -- https://www.sqlite.org/lang_corefunc.html#quote
@@ -29,31 +29,32 @@ SET data = json_patch(
                         SELECT COUNT(revlog.id)
                         FROM revlog
                         WHERE revlog.cid = cards.id
-                            -- 0=learning
-                            -- 1=review
-                            -- 2=relearning
-                            -- 3=filtered (old anki versions called this cram/early. It is assigned
-                            --             when reviewing cards before they're due, or when
-                            --             rescheduling is disabled)
-                            -- 4=manual
-                            -- https://github.com/ankitects/anki/blob/23.10.1/rslib/src/revlog/mod.rs#L65-L75
+                            -- 0 = Learning
+                            -- 1 = Review
+                            -- 2 = Relearning
+                            -- 3 = Filtered (Old Anki versions called this "Cram" or "Early". It's
+                            --               assigned when reviewing cards before they're due, or
+                            --               when rescheduling is disabled)
+                            -- 4 = Manual
+                            -- 5 = Rescheduled
+                            -- https://github.com/ankitects/anki/blob/24.11/rslib/src/revlog/mod.rs#L65-L76
                             --
                             -- We only want to find cards that have been reviewed normally.
                             -- Reviewing cards before they're due or when rescheduling is disabled
                             -- are ignored because we want to keep the same behaviour as the custom
                             -- scheduler
                             AND revlog.type = 1
-                            -- review: 1(wrong), 2(hard), 3(ok), 4(easy)
-                            -- learn/relearn: 1(wrong), 2(ok), 3(easy)
+                            -- review: 1 (again), 2 (hard), 3 (good), 4 (easy)
+                            -- learn/relearn: 1 (again), 2 (good), 3 (easy)
                             -- 0 represents manual rescheduling
-                            -- https://github.com/ankitects/anki/blob/23.10.1/rslib/src/revlog/mod.rs#L43
+                            -- https://github.com/ankitects/anki/blob/24.11/rslib/src/revlog/mod.rs#L43
                             --
                             -- A successful review is if we have pressed ease=3 (Good) or
                             -- ease=4 (Easy)
                             AND revlog.ease IN (3, 4)
                             -- revlog ids are epoch-milliseconds timestamp of when you did the
                             -- review
-                            -- https://github.com/ankitects/anki/blob/23.10.1/rslib/src/scheduler/answering/revlog.rs#L44
+                            -- https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/answering/revlog.rs#L44
                             --
                             -- We want to find the number of successful reviews after the last time
                             -- ease=1 (Again) was pressed
@@ -84,24 +85,26 @@ SET data = json_patch(
                                 SELECT IFNULL(MAX(revlog.id), 0)
                                 FROM revlog
                                 WHERE revlog.cid = cards.id
-                                    -- 0=learning
-                                    -- 1=review
-                                    -- 2=relearning
-                                    -- 3=filtered (old anki versions called this cram/early. It is
-                                    --             assigned when reviewing cards before they're due,
-                                    --             or when rescheduling is disabled)
-                                    -- 4=manual
-                                    -- https://github.com/ankitects/anki/blob/23.10.1/rslib/src/revlog/mod.rs#L65-L75
+                                    -- 0 = Learning
+                                    -- 1 = Review
+                                    -- 2 = Relearning
+                                    -- 3 = Filtered (Old Anki versions called this "Cram" or
+                                    --               "Early". It's assigned when reviewing cards
+                                    --               before they're due, or when rescheduling is
+                                    --               disabled)
+                                    -- 4 = Manual
+                                    -- 5 = Rescheduled
+                                    -- https://github.com/ankitects/anki/blob/24.11/rslib/src/revlog/mod.rs#L65-L76
                                     --
                                     -- We only want to find cards that have been reviewed normally.
                                     -- Reviewing cards before they're due or when rescheduling is
                                     -- disabled are ignored because we want to keep the same
                                     -- behaviour as the custom scheduler
                                     AND revlog.type = 1
-                                    -- review: 1(wrong), 2(hard), 3(ok), 4(easy)
-                                    -- learn/relearn: 1(wrong), 2(ok), 3(easy)
+                                    -- review: 1 (again), 2 (hard), 3 (good), 4 (easy)
+                                    -- learn/relearn: 1 (again), 2 (good), 3 (easy)
                                     -- 0 represents manual rescheduling
-                                    -- https://github.com/ankitects/anki/blob/23.10.1/rslib/src/revlog/mod.rs#L43
+                                    -- https://github.com/ankitects/anki/blob/24.11/rslib/src/revlog/mod.rs#L43
                                     --
                                     -- ease=1 (Again) was pressed
                                     AND revlog.ease = 1
@@ -115,8 +118,11 @@ SET data = json_patch(
         )
     )
 )
--- 0=new, 1=learning, 2=review, 3=relearn
--- https://github.com/ankitects/anki/blob/23.10.1/rslib/src/card/mod.rs#L40
+-- 0 = New
+-- 1 = Learn
+-- 2 = Review
+-- 3 = Relearn
+-- https://github.com/ankitects/anki/blob/24.11/rslib/src/card/mod.rs#L40
 --
 -- Only modify review cards because new, learn, and relearn cards have not had a successful review
 -- yet. It'll also avoid adding unnecessary customData to the cards which will take up extra space

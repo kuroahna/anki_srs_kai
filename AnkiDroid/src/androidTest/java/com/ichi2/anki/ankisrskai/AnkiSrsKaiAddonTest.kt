@@ -214,17 +214,23 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         assertThat(cardFromDb)
             .hasReps(1)
             .hasCustomData("""{"test":100}""")
+            // Although we set the difficulty and stability to 5.0 and 100.0 respectively, after
+            // answering good, new FSRS memory states are calculated using the default weights.
+            //
+            // Any time the default FSRS weights are updated, these values will change
+            //
+            // https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/answering/mod.rs#L433
             .hasMemoryState(
                 FsrsMemoryState
                     .newBuilder()
-                    .setDifficulty(5.0F)
-                    .setStability(100.0F)
+                    .setDifficulty(4.992F)
+                    .setStability(140.777F)
                     .build()
             )
             .hasDesiredRetention(0.90F)
         assertThat(
             col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"s":100.0,"d":5.0,"dr":0.9,"cd":"{\"test\":100}"}""")
+            equalTo("""{"s":140.777,"d":4.992,"dr":0.9,"cd":"{\"test\":100}"}""")
         )
 
         col.db.execute(sql)
@@ -236,14 +242,14 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
             .hasMemoryState(
                 FsrsMemoryState
                     .newBuilder()
-                    .setDifficulty(5.0F)
-                    .setStability(100.0F)
+                    .setDifficulty(4.992F)
+                    .setStability(140.777F)
                     .build()
             )
             .hasDesiredRetention(0.90F)
         assertThat(
             col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"s":100.0,"d":5.0,"dr":0.9,"cd":"{\"test\":100,\"c\":1}"}""")
+            equalTo("""{"s":140.777,"d":4.992,"dr":0.9,"cd":"{\"test\":100,\"c\":1}"}""")
         )
     }
 
