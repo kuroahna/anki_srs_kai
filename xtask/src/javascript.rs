@@ -4,7 +4,7 @@
 
 pub const HEADER: &str = r#"
 const deckOptions = {
-    \"deck1\": {
+    "deck1": {
         easeReward: {
             minimumConsecutiveSuccessfulReviewsRequiredForReward: 3,
             baseEaseReward: 0.05,
@@ -27,7 +27,7 @@ const deckOptions = {
             },
         },
     },
-    \"Global Settings\": {
+    "Global Settings": {
         easeReward: {
             minimumConsecutiveSuccessfulReviewsRequiredForReward: 3,
             baseEaseReward: 0.05,
