@@ -1,0 +1,10 @@
+[book]
+authors = ["kuroahna"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Anki SRS Kai"
+
+[output.html]
+git-repository-url = "https://github.com/kuroahna/anki_srs_kai"
+mathjax-support = true

@@ -135,7 +135,10 @@
           };
           localDirectory = pkgs.lib.fileset.toSource {
             root = ./.;
-            fileset = pkgs.lib.fileset.unions [ ./AnkiDroid ./addon/update_custom_data.sql ];
+            fileset = pkgs.lib.fileset.unions [
+              ./AnkiDroid
+              ./addon/update_custom_data.sql
+            ];
           };
           srcs = [
             finalAttrs.ankiDroidSource
@@ -229,7 +232,10 @@
         devShells.default = craneLib.devShell {
           checks = self.checks.${system};
 
-          packages = with pkgs; [ rust-analyzer ];
+          packages = with pkgs; [
+            mdbook
+            rust-analyzer
+          ];
 
           # fixes: the cargo feature `public-dependency` requires a nightly
           # version of Cargo, but this is the `stable` channel
