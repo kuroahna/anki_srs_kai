@@ -39,16 +39,16 @@ const deckOptions = {
             enableFuzz: true,
             maximumInterval: 36500,
             intervalModifier: 1.00,
-            // Approximation of the default FSRS v4 parameters
-            // [0.4, 0.6, 2.4, 5.8, 4.93, 0.94, 0.86, 0.01, 1.49, 0.14, 0.94, 2.18, 0.05, 0.34, 1.26, 0.29, 2.61]
+            // Approximation of the default FSRS-5 parameters
+            // [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046, 1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315, 2.9898, 0.51655, 0.6621]
             calculateHardMultiplier: (currentEaseFactor, currentInterval) => {
-                return (currentEaseFactor / Math.pow(currentInterval, 0.028372)) - 0.739;
+                return currentEaseFactor * Math.pow(currentInterval, -0.013242011) + (-1.048236196);
             },
             calculateGoodMultiplier: (currentEaseFactor, currentInterval) => {
-                return (currentEaseFactor / Math.pow(currentInterval, 0.153776)) + 1.124;
+                return currentEaseFactor * Math.pow(currentInterval, -0.154370758) + (1.395807731);
             },
             calculateEasyMultiplier: (currentEaseFactor, currentInterval) => {
-                return (currentEaseFactor / Math.pow(currentInterval, 0.45)) + 5.348;
+                return currentEaseFactor * Math.pow(currentInterval, -0.178728777) + (5.295133129);
             },
         },
     },
