@@ -16,3 +16,7 @@
 - [Recommendations](guide/recommendations.md)
 - [Personal Results](guide/personalResults.md)
 - [Support development](guide/supportDevelopment.md)
+
+---
+
+[Changelog](CHANGELOG.md)
