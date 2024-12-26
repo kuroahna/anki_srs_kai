@@ -22,3 +22,50 @@ jobs:
 
       - name: Lint
         run: nix flake check
+
+  integration_tests:
+    name: Integration tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v8
+
+        # The nix installer action already enables KVM which is useful for
+        # running the Android emulator
+      - name: Run integration tests
+        run: nix build --keep-failed --print-build-logs .#ankidroid 2> >(tee errorLogs)
+
+      - name: Collect logs
+        if: always()
+        run: |
+          if [ -d "result" ]; then
+            export LOG_FILE_PATH="result/adb-log.txt"
+            export VIDEO_FILE_PATH="result/video.webm"
+          else
+            export BUILD_DIR=$(grep "keeping build directory" errorLogs | sed -E "s/.*'(.*)'.*/\1/")
+            sudo chown -R $(whoami):$(id -gn) "${BUILD_DIR}"
+            export LOG_FILE_PATH=$(sudo find ${BUILD_DIR}/logs-* -iname "adb-log.txt")
+            export VIDEO_FILE_PATH=$(sudo find ${BUILD_DIR}/logs-* -iname "video.webm")
+          fi
+          echo "logFilePath=${LOG_FILE_PATH}" >> $GITHUB_ENV
+          echo "videoFilePath=${VIDEO_FILE_PATH}" >> $GITHUB_ENV
+
+      - name: Upload Emulator Log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: adb-log.txt
+          path: ${{ env.logFilePath }}
+
+      - name: Upload Emulator Screen Record
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: video.webm
+          path: ${{ env.videoFilePath }}
