@@ -81,6 +81,25 @@
           }
         );
 
+        addon = pkgs.stdenv.mkDerivation (finalAttrs: {
+          pname = "AnkiSrsKaiAddon";
+          version = anki_srs_kai.version;
+          strictDeps = true;
+
+          src = pkgs.lib.fileset.toSource {
+            root = ./.;
+            fileset = pkgs.lib.fileset.unions [ ./addon ];
+          };
+
+          nativeBuildInputs = (with pkgs; [ zip ]);
+
+          buildPhase = ''
+            mkdir -p $out
+            cd addon
+            zip $out/addon.ankiaddon *
+          '';
+        });
+
         androidPkgs = import nixpkgs {
           inherit system;
           config = {
@@ -259,6 +278,7 @@
         packages.ankidroid = ankidroid;
 
         devShells.addon = pkgs.mkShell { packages = with pkgs; [ black ]; };
+        packages.addon = addon;
       }
     );
 }
