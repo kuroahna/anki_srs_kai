@@ -225,6 +225,25 @@
             cp $LOGS_DIR/* $out
           '';
         });
+
+        docs = pkgs.stdenv.mkDerivation (finalAttrs: {
+          pname = "AnkiSrsKaiDocs";
+          version = anki_srs_kai.version;
+          strictDeps = true;
+
+          src = pkgs.lib.fileset.toSource {
+            root = ./.;
+            fileset = pkgs.lib.fileset.unions [ ./guide ];
+          };
+
+          nativeBuildInputs = (with pkgs; [ mdbook ]);
+
+          buildPhase = ''
+            mkdir -p $out
+            mdbook build guide
+            cp -r guide/book/* $out
+          '';
+        });
       in
       {
         formatter = pkgs.nixfmt-rfc-style;
@@ -279,6 +298,8 @@
 
         devShells.addon = pkgs.mkShell { packages = with pkgs; [ black ]; };
         packages.addon = addon;
+
+        packages.docs = docs;
       }
     );
 }
