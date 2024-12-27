@@ -109,7 +109,11 @@ D'' &= w_7 \cdot D_0(4) + (1 - w_7) \cdot D' \\\\
 \end{align}
 \\]
 
-We can calculate this automatically by using some code
+We can calculate this automatically by using some code.
+
+<details>
+<summary>Calculate the number of times to go from a difficulty of 10 to 9 by
+        only pressing the Good button</summary>
 
 ```
 pip install --quiet fsrs==4.1.1
@@ -119,9 +123,9 @@ pip install --quiet fsrs==4.1.1
 import fsrs
 
 
-parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604,
-0.0046, 1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
-2.9898, 0.51655, 0.6621]
+parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
+              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
+              2.9898, 0.51655, 0.6621]
 desired_retention = 0.90
 
 
@@ -141,9 +145,6 @@ while difficulty >= target_difficulty:
         print(f"{n}: {difficulty}")
 ```
 
-By setting the `target_difficulty` variable to 9, we see that it takes 35
-reviews pressing good in a row before it reaches a difficulty of 9.
-
 ```
 target difficulty: 9
 1: 9.968832707311106
@@ -155,17 +156,49 @@ target difficulty: 9
 34: 9.016932809163938
 35: 8.990287625552892
 ```
+</details>
 
+We see that it takes 35 reviews pressing the Good button in a row before it
+reaches a difficulty of 9.
 
-Furthermore, by setting the `target_difficulty` variable to the initial
-difficulty when the first rating is Easy; that is,
+Furthermore, we can calculate how many reviews it will take to go from a
+difficulty of 10 to the initial difficulty when the first rating is Easy (the
+target difficulty that every card will converge to in FSRS-5).
 
-```python
-target_difficulty = scheduler._initial_difficulty(fsrs.Rating.Easy)
+<details>
+<summary>Calculate number of times to go from a difficulty of 10 to the initial
+        difficulty when the first rating is Easy by only pressing the Good
+        button</summary>
+
+```
+pip install --quiet fsrs==4.1.1
 ```
 
-We see that it takes almost 7000 reviews before it reaches the target
-difficulty.
+```python
+import fsrs
+
+
+parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
+              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
+              2.9898, 0.51655, 0.6621]
+desired_retention = 0.90
+
+
+scheduler = fsrs.Scheduler(
+    parameters = parameters,
+    desired_retention = desired_retention,
+    maximum_interval = 36500,
+)
+
+n = 0
+difficulty = 10.0
+target_difficulty = scheduler._initial_difficulty(fsrs.Rating.Easy)
+print(f"target difficulty: {target_difficulty}")
+while difficulty >= target_difficulty:
+        difficulty = scheduler._next_difficulty(difficulty, fsrs.Rating.Good)
+        n += 1
+        print(f"{n}: {difficulty}")
+```
 
 ```
 target difficulty: 3.2245015893713678
@@ -178,9 +211,105 @@ target difficulty: 3.2245015893713678
 6971: 3.2245015893713678
 6972: 3.2245015893713673
 ```
+</details>
+
+We see that it takes almost 7000 reviews before it reaches the target
+difficulty.
 
 In other words, **the smaller the value \\(w_7\\) is, the longer it will take for a
 card to exit Difficulty Hell**.
+
+The effects of having a difficult card can be calculated with the code below.
+
+<details>
+<summary>Calculate next interval for a card with a difficulty of 10.0</summary>
+
+```
+pip install --quiet fsrs==4.1.1
+```
+
+```python
+import fsrs
+
+
+parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
+              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
+              2.9898, 0.51655, 0.6621]
+desired_retention = 0.90
+
+difficulty = 10.0
+stability = 100.0
+retrievability = 0.90
+
+scheduler = fsrs.Scheduler(
+    parameters = parameters,
+    desired_retention = desired_retention,
+    maximum_interval = 36500,
+)
+
+next_stability = scheduler._next_stability(difficulty, stability, retrievability, fsrs.Rating.Good)
+next_interval = scheduler._next_interval(next_stability)
+print(f"Next recall stability: {next_stability}")
+print(f"Next interval: {next_interval}")
+```
+
+```
+Next recall stability: 129.07449108737947
+Next interval: 129
+```
+</details>
+
+For a card with a difficulty of 10.0, stability (interval) of 100 days,
+retrievability of 90%, and desired retention of 90% using the default FSRS-5
+parameters, the next interval is 129 days.
+
+<details>
+<summary>Calculate next interval for a card with a difficulty of 5.0</summary>
+
+```
+pip install --quiet fsrs==4.1.1
+```
+
+```python
+import fsrs
+
+
+parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
+              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
+              2.9898, 0.51655, 0.6621]
+desired_retention = 0.90
+
+difficulty = 10.0
+stability = 100.0
+retrievability = 0.90
+
+scheduler = fsrs.Scheduler(
+    parameters = parameters,
+    desired_retention = desired_retention,
+    maximum_interval = 36500,
+)
+
+next_stability = scheduler._next_stability(difficulty, stability, retrievability, fsrs.Rating.Good)
+next_interval = scheduler._next_interval(next_stability)
+print(f"Next recall stability: {next_stability}")
+print(f"Next interval: {next_interval}")
+```
+
+```
+Next recall stability: 274.44694652427677
+Next interval: 274
+```
+</details>
+
+In contrast, for a card with a difficulty of 5.0, stability (interval) of 100
+days, retrievability of 90%, and desired retention of 90% using the default
+FSRS-5 parameters, the next interval is 274 days.
+
+In this case, the card with a difficulty of 10.0 has its interval reduced by
+2.1x compared to the card with a difficulty of 5.0. This is an issue because if
+a card was previously difficult, but became easier via increased repetitions and
+better memory encoding of the material, then the user will be doing more reviews
+than necessary, resulting in an **increased workload**.
 
 Whether the mean reversion in FSRS or the Straight Rewards addon for SM-2 is
 actually effective is still under research, but given that FSRS-5 is optimized
