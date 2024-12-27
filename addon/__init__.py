@@ -1,5 +1,6 @@
 import anki
 import aqt
+import os
 from aqt.qt import QAction
 
 
@@ -13,7 +14,8 @@ def update_cards():
     if collection is None:
         raise Exception("collection is not available")
 
-    with open("update_custom_data.sql", "r") as file:
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(current_path, "update_custom_data.sql"), "r") as file:
         sql = file.read()
         collection.db.execute(sql)
 
