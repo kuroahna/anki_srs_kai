@@ -166,9 +166,9 @@ difficulty of 10 to the initial difficulty when the first rating is Easy (the
 target difficulty that every card will converge to in FSRS-5).
 
 <details>
-<summary>Calculate number of times to go from a difficulty of 10 to the initial
-        difficulty when the first rating is Easy by only pressing the Good
-        button</summary>
+<summary>Calculate the number of times to go from a difficulty of 10 to the
+        initial difficulty when the first rating is Easy by only pressing the
+        Good button</summary>
 
 ```
 pip install --quiet fsrs==4.1.1
@@ -222,7 +222,8 @@ card to exit Difficulty Hell**.
 The effects of having a difficult card can be calculated with the code below.
 
 <details>
-<summary>Calculate next interval for a card with a difficulty of 10.0</summary>
+<summary>Calculate the next interval for a card with a difficulty of
+        10.0</summary>
 
 ```
 pip install --quiet fsrs==4.1.1
@@ -264,7 +265,8 @@ retrievability of 90%, and desired retention of 90% using the default FSRS-5
 parameters, the next interval is 129 days.
 
 <details>
-<summary>Calculate next interval for a card with a difficulty of 5.0</summary>
+<summary>Calculate the next interval for a card with a difficulty of
+        5.0</summary>
 
 ```
 pip install --quiet fsrs==4.1.1
@@ -311,6 +313,59 @@ a card was previously difficult, but became easier via increased repetitions and
 better memory encoding of the material, then the user will be doing more reviews
 than necessary, resulting in an **increased workload**.
 
+Additionally, with the default FSRS-5 parameters, a card with a difficulty of
+5.0 only takes pressing the Again button 5 times before it reaches a difficulty
+of 9.23.
+
+<details>
+<summary>Calculate the number of times to go from a difficulty of 5 to
+        9</summary>
+
+```
+pip install --quiet fsrs==4.1.1
+```
+
+```python
+import fsrs
+
+
+parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
+              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
+              2.9898, 0.51655, 0.6621]
+desired_retention = 0.90
+
+
+scheduler = fsrs.Scheduler(
+    parameters = parameters,
+    desired_retention = desired_retention,
+    maximum_interval = 36500,
+)
+
+n = 0
+difficulty = 5
+target_difficulty = 9
+print(f"target difficulty: {target_difficulty}")
+while difficulty <= target_difficulty:
+        difficulty = scheduler._next_difficulty(difficulty, fsrs.Rating.Again)
+        n += 1
+        print(f"{n}: {difficulty}")
+```
+
+```
+target difficulty: 9
+1: 6.607035107311108
+2: 7.687540460685953
+3: 8.414028521438494
+4: 8.902489685251803
+5: 9.230911198891961
+```
+</details>
+
+This scenario is not limited to pressing the Again button 5 times in a row. It
+is possible to enter Difficulty Hell with the Again -> Good -> Again -> Good
+loop. If \\(w_7\\) is close to 0, it will take many reviews pressing the Good
+button before the card exits Difficulty Hell.
+
 Whether the mean reversion in FSRS or the Straight Rewards addon for SM-2 is
 actually effective is still under research, but given that FSRS-5 is optimized
 on the review history of 20,000 users and found that \\(w_7\\) to be near
@@ -327,6 +382,14 @@ of the FSRS algorithm. Ideally, the only parameter the user should configure is
 the [Desired
 Retention](https://docs.ankiweb.net/deck-options.html#desired-retention)
 setting.
+
+Using the Easy button more often can fix this issue, but deciding whether to
+press the Easy button to decrease the difficulty or not introduces extra mental
+fatigue while reviewing. Additionally, the difficulty of a card is not shown
+during reviews. Moreover, some users only use the Again and Good buttons (ie,
+Pass/Fail) to reduce mental fatigue. In this case, the difficulty of a card
+will require many reviews pressing the Good button before it exits Difficulty
+Hell if \\(w_7\\) is close to 0.
 
 You can determine if your deck is stuck in Difficulty Hell by navigating to the
 **Statistics** screen, scrolling down to the **Card Difficulty** graph, and
