@@ -7,6 +7,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [24.12.0] - 2024-12-27
+
 ### Added
 
 - Anki SRS Kai custom scheduler.

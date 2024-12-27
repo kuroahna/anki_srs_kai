@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "anki_srs_kai"
-version = "24.10.0"
+version = "24.12.0"
 dependencies = [
  "js-sys",
  "rand",
@@ -401,7 +401,7 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
 name = "xtask"
-version = "24.10.0"
+version = "24.12.0"
 
 [[package]]
 name = "zerocopy"
