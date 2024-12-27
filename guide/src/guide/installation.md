@@ -14,3 +14,14 @@ To install Anki SRS Kai:
    the custom scheduler code in the textbox.
 4. Follow the [Configuration](configuration.md) section.
 5. Click on the **Save** button.
+
+## Uninstall
+
+To uninstall Anki SRS Kai:
+
+1. Open up the **Options** page for any deck.
+2. Scroll down to the **Advanced** section, under **Custom scheduling**, delete
+   the custom scheduler code.
+4. Click on the **Save** button.
+
+You can now use Anki's native scheduler (SM-2 or FSRS).
