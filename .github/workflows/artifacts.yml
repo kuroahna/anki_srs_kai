@@ -1,0 +1,51 @@
+name: "Build artifacts"
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  build_custom_scheduler:
+    name: Build custom scheduler
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@v16
+
+    - name: Run the Magic Nix Cache
+      uses: DeterminateSystems/magic-nix-cache-action@v8
+
+    - name: Build custom scheduler
+      run: |
+        nix build --print-build-logs
+
+    - name: Upload custom scheduler
+      uses: actions/upload-artifact@v4
+      with:
+        name: anki_srs_kai.js
+        path: result/dist/anki_srs_kai.js
+
+  build_addon:
+    name: Build addon
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@v16
+
+    - name: Run the Magic Nix Cache
+      uses: DeterminateSystems/magic-nix-cache-action@v8
+
+    - name: Build addon
+      run: |
+        nix build --print-build-logs .#addon
+
+    - name: Upload addon
+      uses: actions/upload-artifact@v4
+      with:
+        name: addon.ankiaddon
+        path: result/addon.ankiaddon
