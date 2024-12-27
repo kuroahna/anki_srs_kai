@@ -233,7 +233,7 @@
 
           src = pkgs.lib.fileset.toSource {
             root = ./.;
-            fileset = pkgs.lib.fileset.unions [ ./guide ];
+            fileset = pkgs.lib.fileset.unions [ ./CHANGELOG.md ./guide ];
           };
 
           nativeBuildInputs = (with pkgs; [ mdbook ]);
