@@ -97,6 +97,8 @@ class AnkiSrsKaiTestUtils private constructor() {
 
         fun clickShowAnswerAndAnswerAgain() {
             onView(withId(R.id.flashcard_layout_flip))
+                .checkWithTimeout(matches(isDisplayed()))
+            onView(withId(R.id.flashcard_layout_flip))
                 .perform(click())
             // We need to wait for the card to fully load to allow enough time for
             // the messages to be passed in and out of the WebView when evaluating
@@ -109,6 +111,8 @@ class AnkiSrsKaiTestUtils private constructor() {
         }
 
         fun clickShowAnswerAndAnswerHard() {
+            onView(withId(R.id.flashcard_layout_flip))
+                .checkWithTimeout(matches(isDisplayed()))
             onView(withId(R.id.flashcard_layout_flip))
                 .perform(click())
             // We need to wait for the card to fully load to allow enough time for
@@ -123,6 +127,8 @@ class AnkiSrsKaiTestUtils private constructor() {
 
         fun clickShowAnswerAndAnswerGood() {
             onView(withId(R.id.flashcard_layout_flip))
+                .checkWithTimeout(matches(isDisplayed()))
+            onView(withId(R.id.flashcard_layout_flip))
                 .perform(click())
             // We need to wait for the card to fully load to allow enough time for
             // the messages to be passed in and out of the WebView when evaluating
@@ -135,6 +141,8 @@ class AnkiSrsKaiTestUtils private constructor() {
         }
 
         fun clickShowAnswerAndAnswerEasy() {
+            onView(withId(R.id.flashcard_layout_flip))
+                .checkWithTimeout(matches(isDisplayed()))
             onView(withId(R.id.flashcard_layout_flip))
                 .perform(click())
             // We need to wait for the card to fully load to allow enough time for
@@ -166,7 +174,7 @@ class AnkiSrsKaiTestUtils private constructor() {
         private fun ViewInteraction.checkWithTimeout(
             viewAssertion: ViewAssertion,
             retryWaitTimeInMilliseconds: Long = 100,
-            maxWaitTimeInMilliseconds: Long = TimeUnit.SECONDS.toMillis(10)
+            maxWaitTimeInMilliseconds: Long = TimeUnit.SECONDS.toMillis(60)
         ) {
             val startTime = TimeManager.time.intTimeMS()
 
