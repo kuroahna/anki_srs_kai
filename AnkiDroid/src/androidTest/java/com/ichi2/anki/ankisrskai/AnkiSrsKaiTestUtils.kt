@@ -1,6 +1,9 @@
 package com.ichi2.anki.ankisrskai
 
 import android.content.Context
+import android.view.View
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
@@ -23,6 +26,8 @@ import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.libanki.Card
 import com.ichi2.libanki.Consts
 import com.ichi2.libanki.utils.TimeManager
+import org.hamcrest.Description
+import org.hamcrest.TypeSafeMatcher
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -70,25 +75,69 @@ class AnkiSrsKaiTestUtils private constructor() {
         }
 
         /**
+         * Checks if the navigation drawer is open
+         *
+         * Useful for waiting long enough for the drawer to open. Even if
+         * animations are disabled, the navigation drawer still slides into view
+         * which can cause test flakiness
+         */
+        fun isDrawerOpen() {
+            onView(withId(R.id.drawer_layout))
+                .checkWithTimeout(matches(
+                    object : TypeSafeMatcher<View>() {
+                        override fun matchesSafely(item: View?): Boolean {
+                            return (item as DrawerLayout).isDrawerOpen(GravityCompat.START)
+                        }
+
+                        override fun describeTo(description: Description?) {
+                            "checks if drawer is open"
+                        }
+
+                    }
+                ))
+        }
+
+        fun isDrawerClosed() {
+            onView(withId(R.id.drawer_layout))
+                .checkWithTimeout(matches(
+                    object : TypeSafeMatcher<View>() {
+                        override fun matchesSafely(item: View?): Boolean {
+                            return !(item as DrawerLayout).isDrawerOpen(GravityCompat.START)
+                        }
+
+                        override fun describeTo(description: Description?) {
+                            "checks if drawer is closed"
+                        }
+
+                    }
+                ))
+        }
+
+        /**
          * Refreshes the card counts in the deck picker. Useful for tests when
          * modifying the card state directly from the database
          */
         fun refreshDeck() {
+            isDrawerClosed()
             onView(withContentDescription(R.string.drawer_open))
                 .checkWithTimeout(matches(isDisplayed()))
             onView(withContentDescription(R.string.drawer_open))
                 .perform(click())
+            isDrawerOpen()
             // Opening the settings page and going back to the deck picker
             // will cause the deck picker to refresh its state
             onView(withId(R.id.nav_settings)).checkWithTimeout(matches(isDisplayed()))
             onView(withId(R.id.nav_settings)).perform(click())
             clickBackButton()
+            isDrawerClosed()
             onView(withContentDescription(R.string.drawer_open))
                 .checkWithTimeout(matches(isDisplayed()))
             onView(withContentDescription(R.string.drawer_open))
                 .perform(click())
+            isDrawerOpen()
             onView(withId(R.id.nav_decks)).checkWithTimeout(matches(isDisplayed()))
             onView(withId(R.id.nav_decks)).perform(click())
+            isDrawerClosed()
         }
 
         fun rebuildFilteredDeck(deckName: String) {
