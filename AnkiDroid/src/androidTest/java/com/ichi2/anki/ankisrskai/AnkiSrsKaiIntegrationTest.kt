@@ -15,6 +15,7 @@ import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.clickShowAnswerAn
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.clickShowAnswerAndAnswerHard
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.closeBackupCollectionDialogIfExists
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.closeGetStartedScreenIfExists
+import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.disableAnimations
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.hasCardType
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.hasCustomData
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.hasDesiredRetention
@@ -66,6 +67,7 @@ class AnkiSrsKaiIntegrationTest : InstrumentedTest() {
 
     @Before
     fun setup() {
+        disableAnimations()
         runBlocking {
             CollectionManager.deleteCollectionDirectory()
         }

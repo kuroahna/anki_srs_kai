@@ -1,6 +1,8 @@
 package com.ichi2.anki.ankisrskai
 
+import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.ViewInteraction
@@ -17,6 +19,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import anki.cards.FsrsMemoryState
 import com.ichi2.anki.CollectionManager
 import com.ichi2.anki.R
+import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.libanki.Card
 import com.ichi2.libanki.Consts
 import com.ichi2.libanki.utils.TimeManager
@@ -27,6 +30,12 @@ import kotlin.test.fail
 
 class AnkiSrsKaiTestUtils private constructor() {
     companion object {
+        fun disableAnimations() {
+            val context = ApplicationProvider.getApplicationContext<Context>()
+            val key = context.getString(R.string.safe_display_key)
+            context.sharedPrefs().edit().putBoolean(key, true).commit()
+        }
+
         fun closeGetStartedScreenIfExists() {
             onView(withId(R.id.get_started))
                 .withFailureHandler { _, _ -> }
