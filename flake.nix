@@ -131,7 +131,7 @@
 
         ankidroid = pkgs.stdenv.mkDerivation (finalAttrs: {
           pname = "AnkiDroid";
-          version = "v2.20.0";
+          version = "v2.20.1";
           strictDeps = true;
 
           ankiDroidSource = pkgs.fetchFromGitHub {
@@ -149,7 +149,7 @@
             #
             # https://nixos.org/manual/nixpkgs/unstable/index.html#chap-pkgs-fetchers-caveats
             # https://nixos.org/manual/nixpkgs/unstable/index.html#sec-pkgs-fetchers-updating-source-hashes
-            hash = "sha256-Z3tr8ca+KmIqGpxLQJtoMZAyEtARux2oAhLleELyhKA=";
+            hash = "sha256-CPCczLovuQTjUTWgjVjgZ8PL4idlcTzWZ2wKwqsF+cg=";
             name = finalAttrs.pname;
           };
           localDirectory = pkgs.lib.fileset.toSource {
