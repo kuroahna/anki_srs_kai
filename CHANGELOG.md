@@ -7,6 +7,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Update AnkiDroid integration test suite to use AnkiDroid v2.20.1 with Anki
+backend 24.11.
+
 ## [24.12.0] - 2024-12-27
 
 ### Added
