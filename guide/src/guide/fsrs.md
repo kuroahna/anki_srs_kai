@@ -11,7 +11,7 @@ bonus](https://docs.ankiweb.net/deck-options.html#easy-bonus), etc.
 
 Additionally, the default FSRS-5 parameters are also better than SM-2 for 99.0%
 of users according to the
-[benchmarks](https://github.com/open-spaced-repetition/srs-benchmark/blob/bb552316d128bcd6fdc61862e557408979ca983f/README.md),
+[benchmarks](https://github.com/open-spaced-repetition/srs-benchmark?tab=readme-ov-file#srs-benchmark),
 which is benchmarked on approximately 10,000 Anki users.
 
 However, some users are reluctant to make the switch because they would still
@@ -556,7 +556,7 @@ behaviour off, this is generally not recommended for the same reasons above in
 the [Ease Hell](#ease-hell) section
 
 The SuperMemo and [FSRS
-benchmark](https://github.com/open-spaced-repetition/srs-benchmark/blob/bb552316d128bcd6fdc61862e557408979ca983f/README.md) data
+benchmark](https://github.com/open-spaced-repetition/srs-benchmark?tab=readme-ov-file#srs-benchmark) data
 currently conflict as to which is the best approach here, and more research is
 most likely required before a conclusion can be drawn.
 
