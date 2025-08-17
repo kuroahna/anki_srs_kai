@@ -1,0 +1,329 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Scheduler - Anki SRS Kai</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Anki SRS Kai</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/kuroahna/anki_srs_kai" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="scheduler"><a class="header" href="#scheduler">Scheduler</a></h1>
+<p>The scheduler is the same exact implementation as the Anki SM-2 algorithm.
+However, only review cards are affected. Reviewing cards early (cramming),
+new cards, learning cards, and relearning cards are not affected and will
+default to the native Anki scheduler, either SM-2 or FSRS.</p>
+<p>The main difference is that scheduler extends the notion of the ease factor in
+Anki SM-2 by converting it from a scalar value to a mathematical function based
+on two parameters, the current ease factor and the current interval of the card.
+This addresses the <a href="issuesWithAnkiSM2.html#long-intervals-for-mature-cards">long intervals for mature cards issue with Anki
+SM-2</a>.</p>
+<p>The next interval for a card upon review is calculated with the following
+formula</p>
+<p>\[
+\text{NewInterval} = \text{OldInterval} \times \text{EaseFactor} \times
+\text{IntervalModifier}
+\]</p>
+<h2 id="default-configuration"><a class="header" href="#default-configuration">Default configuration</a></h2>
+<pre><code class="language-javascript">scheduler: {
+    enableFuzz: true,
+    maximumInterval: 36500,
+    intervalModifier: 1.00,
+    // Approximation of the default FSRS-6 parameters
+    // [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+    calculateHardMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.077098162) + (0.144440985);
+    },
+    calculateGoodMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.182458510) + (1.779479164);
+    },
+    calculateEasyMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.183552566) + (3.407921198);
+    },
+},
+</code></pre>
+<h2 id="enable-fuzz"><a class="header" href="#enable-fuzz">Enable fuzz</a></h2>
+<p>According to the <a href="https://docs.ankiweb.net/studying.html#fuzz-factor">Anki
+docs</a>,</p>
+<blockquote>
+<p>When you select an answer button on a review card, Anki also applies a small
+amount of random “fuzz” to prevent cards that were introduced at the same time
+and given the same ratings from sticking together and always coming up for
+review on the same day.</p>
+<p>Learning cards are also given up to 5 minutes of extra delay so that they
+don’t always appear in the same order, but answer buttons won't reflect that.
+It is not possible to turn this feature off.</p>
+</blockquote>
+<p>Set this to <code>true</code> to enable fuzzing. Otherwise, set to <code>false</code> to disable
+fuzzing.</p>
+<p>The custom scheduler allows the user to disable fuzzing, whereas Anki SM-2 does
+not. It is <strong>recommended</strong> to set this value to <code>true</code> to prevent cards from
+sticking together and coming up for review on the same day.</p>
+<h2 id="maximum-interval"><a class="header" href="#maximum-interval">Maximum interval</a></h2>
+<p>According to the <a href="https://docs.ankiweb.net/deck-options.html#maximum-interval">Anki
+docs</a>,</p>
+<blockquote>
+<p>The maximum number of days a review card will wait before it's shown again.
+When reviews have reached the limit, Hard, Good and Easy will all give the
+same delay. The shorter you set this, the greater your workload will be. The
+default is 100 years; you can decrease this to a smaller number if you’re
+willing to trade extra study time for higher retention.</p>
+</blockquote>
+<p><strong>IMPORTANT:</strong> Since the scheduler only affects review cards, the maximum
+interval setting in the deck options preset in the Anki UI has no effect for
+review cards. Please copy the maximum interval setting for the deck here.</p>
+<h2 id="interval-modifier"><a class="header" href="#interval-modifier">Interval modifier</a></h2>
+<p>According to the <a href="https://docs.ankiweb.net/deck-options.html#interval-modifier">Anki
+docs</a>,</p>
+<blockquote>
+<p>An extra multiplier that is applied to all reviews. At its default of 1.00 it
+does nothing. If you set it to 0.80, intervals will be generated at 80% of
+their normal size (so a 10 day interval would become 8 days). You can You can
+thus use the multiplier to to make your reviews less or more frequent.</p>
+</blockquote>
+<p><strong>IMPORTANT:</strong> Since the scheduler only affects review cards, the interval
+modifier setting in the deck options preset in the Anki UI has no effect for
+review cards. Please copy the interval modifier for the deck here.</p>
+<h2 id="calculate-hard-multiplier"><a class="header" href="#calculate-hard-multiplier">Calculate hard multiplier</a></h2>
+<p>A function that takes in two parameters, <code>currentEaseFactor</code> and
+<code>currentInterval</code>, and outputs the resulting ease factor for the Hard button.</p>
+<p>Set to <code>return 0.0;</code> to fallback to Anki's native scheduler, either SM-2 or
+FSRS. This effectively disables the custom scheduler when pressing the Hard
+button.</p>
+<h2 id="calculate-good-multiplier"><a class="header" href="#calculate-good-multiplier">Calculate good multiplier</a></h2>
+<p>A function that takes in two parameters, <code>currentEaseFactor</code> and
+<code>currentInterval</code>, and outputs the resulting ease factor for the Good button.</p>
+<p>Set to <code>return 0.0;</code> to fallback to Anki's native scheduler, either SM-2 or
+FSRS. This effectively disables the custom scheduler when pressing the Good
+button.</p>
+<h2 id="calculate-easy-multiplier"><a class="header" href="#calculate-easy-multiplier">Calculate easy multiplier</a></h2>
+<p>A function that takes in two parameters, <code>currentEaseFactor</code> and
+<code>currentInterval</code>, and outputs the resulting ease factor for the Easy button.</p>
+<p>Set to <code>return 0.0;</code> to fallback to Anki's native scheduler, either SM-2 or
+FSRS. This effectively disables the custom scheduler when pressing the Easy
+button.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../guide/straightRewardMigration.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../guide/fsrsToSM2.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../guide/straightRewardMigration.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../guide/fsrsToSM2.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

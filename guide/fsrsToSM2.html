@@ -1,0 +1,407 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Converting FSRS to SM-2 parameters - Anki SRS Kai</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Anki SRS Kai</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/kuroahna/anki_srs_kai" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="converting-fsrs-to-sm-2-parameters"><a class="header" href="#converting-fsrs-to-sm-2-parameters">Converting FSRS to SM-2 parameters</a></h1>
+<p>Enhancing the Anki SM-2 algorithm by converting the ease factor from a scalar
+value to a mathematical function that takes two parameters, the current ease
+factor and current interval of the card, allows us to approximate FSRS's
+stability increase function with a simple power function.</p>
+<p>According to the <a href="https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c">FSRS
+algorithm</a>,
+the new stability after successful review is calculated as
+\[
+S^\prime_r(D,S,R,G) = S \cdot (e^{w_8} \cdot (11-D) \cdot S^{-w_9} \cdot (e^{w_{10}\cdot(1-R)}-1) \cdot w_{15}(\textrm{if G = 2}) \cdot w_{16}(\textrm{if G = 4}) + 1)
+\]</p>
+<p>and since</p>
+<blockquote>
+<p>Let \(SInc\) (the increase in stability) denotes \(\frac{S^{'}_{r}(D, S,
+R, G)}{S}\) which is equivalent to Anki's ease factor.</p>
+</blockquote>
+<p>we can approximate \(SInc\) with the function \(k \cdot x^a + b\) where
+\(k\) is the current ease factor which has the initial value provided by
+<a href="https://docs.ankiweb.net/deck-options.html#starting-ease">Starting Ease</a>,
+\(x\) is the current interval, and \(a\) and \(b\) is some constant that
+provides the curve of best fit to the \(SInc\) function.</p>
+<p>That is,</p>
+<p>\[
+\text{EaseFactor} = k \cdot x^a + b
+\]</p>
+<p>in the Anki SM-2 next interval function</p>
+<p>\[
+\text{NewInterval} = \text{OldInterval} \times \text{EaseFactor} \times
+\text{IntervalModifier}
+\]</p>
+<h2 id="retrieving-optimized-fsrs-parameters"><a class="header" href="#retrieving-optimized-fsrs-parameters">Retrieving optimized FSRS parameters</a></h2>
+<p><strong>IMPORTANT</strong>: If you do not have many reviews for the optimizer to train on, or
+you have previously used Anki incorrectly, such as pressing the Hard button
+instead of the Again button to fail a card, it is recommended to use the default
+FSRS-6 parameters until your review history is large enough for optimization.</p>
+<p>First, retrieve your optimized FSRS parameters. This can be done either by</p>
+<ol>
+<li>Directly in Anki</li>
+<li>FSRS Optimizer Jupyter Notebook</li>
+</ol>
+<h3 id="anki"><a class="header" href="#anki">Anki</a></h3>
+<p>FSRS can safely be temporarily enabled in the deck options preset by</p>
+<ol>
+<li>Click on the <strong>Gear icon</strong> next to your deck.</li>
+<li>Click on the <strong>Options</strong> button.</li>
+<li>Navigate down to the <strong>FSRS</strong> section and click on the <strong>toggle button</strong> to
+enable FSRS.</li>
+<li>Leave <strong>Desired retention</strong> to the default value. Changing this has no effect on
+the final parameters.</li>
+<li>Copy and save the <strong>FSRS parameters</strong> somewhere for later.</li>
+<li>(Optional) Click on the <strong>Compute minimum recommended retention</strong> label and
+click the <strong>Compute</strong> button. Copy and save the <strong>Minimum recommended
+retention</strong> value somewhere for later.</li>
+<li>Close the deck options preset window and click on <strong>Discard</strong> to discard
+changes.</li>
+</ol>
+<h3 id="fsrs-optimizer-jupyter-notebook"><a class="header" href="#fsrs-optimizer-jupyter-notebook">FSRS Optimizer Jupyter Notebook</a></h3>
+<p>Alternatively, if you don't want to temporarily enable FSRS, the FSRS Optimizer
+Jupyter Notebook can be used instead which provides extra statistics and graphs
+about your review history.</p>
+<ol>
+<li>Go to the <a href="https://github.com/open-spaced-repetition/fsrs4anki/blob/main/fsrs4anki_optimizer.ipynb">FSRS4Anki
+Optimizer</a>.</li>
+<li>Click on the <strong>Open in Colab</strong> button.</li>
+<li>Follow the instructions provided in the notebook.</li>
+<li>Scroll down to the <strong>Result</strong> section</li>
+<li>Copy and save the <strong>optimized FSRS parameters</strong> somewhere for later.</li>
+<li>(Optional) Scroll down to the <strong>Optimize retention to minimize the time of
+reviwes</strong> section, copy and save the <strong>suggested retention</strong> value somewhere
+for later.</li>
+</ol>
+<h2 id="convert-fsrs-to-sm-2"><a class="header" href="#convert-fsrs-to-sm-2">Convert FSRS to SM-2</a></h2>
+<p>To convert your optimized FSRS parameters to SM-2</p>
+<ol>
+<li>Go to the <a href="https://github.com/kuroahna/anki_srs_kai/blob/main/fsrs_to_sm2.ipynb">FSRS to SM-2
+notebook</a>.</li>
+<li>Click on the <strong>Open in Colab</strong> button.</li>
+<li>Replace <code>parameters</code> with your optimized FSRS parameter values.</li>
+<li>Replace <code>starting_ease</code> with the same <a href="https://docs.ankiweb.net/deck-options.html#starting-ease">Starting
+Ease</a> value in your
+deck options preset.</li>
+<li>Replace <code>desired_retention</code> with your desired retention. Optionally, you can
+use the <strong>Minimum recommended retention</strong> value from above.</li>
+<li>Click on the <strong>Runtime</strong> button in the toolbar at the top.</li>
+<li>Click on the <strong>Run all</strong> button.</li>
+<li>Scroll down to for the suggested values.</li>
+</ol>
+<p>For example, with the FSRS-5 default parameters and default Anki SM-2 settings,</p>
+<pre><code class="language-python">parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+starting_ease = 2.5
+desired_retention = 0.90
+</code></pre>
+<p>The output is</p>
+<pre><code>Replace your settings in the Deck Options for your deck with the values below.
+Note:
+1. Use `Graduating interval (good)` if you often press Good when first learning
+   a new card
+2. Otherwise, use `Graduating interval (hard)` if you often press Hard when
+   first learning a new card
+3. Otherwise, use `Graduating interval (again)` if you often press Again when
+   first learning a new card
+4. If you're not sure, use `Graduating interval (good)`
+This is because FSRS considers the first rating for New cards when training its
+parameters. Since Anki SM-2 does not consider the first rating for New cards, it
+is best to set the Graduating interval to the one you most often use
+
+
+Graduating interval (again): 0
+Graduating interval (hard): 1
+Graduating interval (good): 2
+Easy interval: 8
+
+
+Replace the scheduler settings for your deck in the Custom scheduling field in
+the Deck Options with the following values:
+
+
+scheduler: {
+    // ... (other settings)
+    intervalModifier: 1.0,
+    calculateHardMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.077098162) + (0.144440985);
+    },
+    calculateGoodMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.182458510) + (1.779479164);
+    },
+    calculateEasyMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.183552566) + (3.407921198);
+    },
+},
+</code></pre>
+<p>Follow the instructions in the Jupyter notebook output as shown above.</p>
+<ol>
+<li>Click on the <strong>Gear icon</strong> next to your deck.</li>
+<li>Click on the <strong>Options</strong> button.</li>
+<li>Set the <a href="https://docs.ankiweb.net/deck-options.html#graduating-interval">Graduating
+interval</a> to
+one of the suggested values depending on your review habits. If you are not
+sure, use the <strong>Graduating interval (good)</strong> value.</li>
+<li>(Optional) Set the <a href="https://docs.ankiweb.net/deck-options.html#minimum-interval">Minimum
+interval</a> to one
+of the suggested graduating interval values depending on your review habits.
+If you are not sure, use the <strong>Graduating interval (good)</strong> value.</li>
+<li>Set the <a href="https://docs.ankiweb.net/deck-options.html#easy-interval">Easy
+interval</a> to the
+suggested value.</li>
+<li>Scroll down to <strong>Advanced</strong> section, click on <strong>Custom scheduling</strong>, and
+replace the <code>scheduler</code> section in the associated deck in <code>deckOptions</code></li>
+<li>Click on <strong>Save</strong>.</li>
+</ol>
+<h2 id="fine-tuning-the-parameters"><a class="header" href="#fine-tuning-the-parameters">Fine tuning the parameters</a></h2>
+<p>Assuming the Good button is pressed for each review, we can
+<a href="https://www.desmos.com/calculator/comgwaxi4y">graph</a> the functions \(SInc\)
+and <code>calculateGoodMultiplier</code> (similar graphs can be created for the Hard and
+Easy buttons).</p>
+<p><img src="../images/fsrsToSM2GoodButton.png" alt="FSRS to SM2 Good Button" /></p>
+<p>As shown in the graph above, as the interval of a card increases, the smaller
+the ease factor (ie, the increase in interval) which solves the long intervals
+for mature cards issue with SM-2. If the ease factor function grows too fast or
+too slow, you can modify the parameters accordingly.</p>
+<h2 id="reschedule-all-cards-immediately"><a class="header" href="#reschedule-all-cards-immediately">Reschedule all cards immediately</a></h2>
+<p>FSRS has the option to <a href="https://docs.ankiweb.net/deck-options.html#reschedule-cards-on-change">reschedule cards on
+change</a>
+which will reschedule <strong>all</strong> cards with new intervals immediately instead of
+being rescheduled as it comes up during reviews. While this can be temporarily
+used as part of the conversion from FSRS to SM-2, it is <strong>not recommended</strong>
+since it often results in a large number of cards becoming due. Instead, it is
+recommended to allow cards reschedule with the custom scheduler as it comes up
+during reviews. This means that it will <strong>take a few weeks or months before any
+visible results can be observed with the new scheduler</strong>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../guide/scheduler.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../guide/configurationExamples.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../guide/scheduler.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../guide/configurationExamples.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

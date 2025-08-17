@@ -1,0 +1,1784 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Anki SRS Kai</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Anki SRS Kai</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/kuroahna/anki_srs_kai" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>Anki SRS Kai (暗記ＳＲＳ改) is a custom scheduler written in 🦀 Rust 🚀 and
+compiled to 📦 WebAssembly for <a href="https://apps.ankiweb.net/">Anki</a>. It aims to fix
+the issues with the default Anki SM-2 algorithm while keeping the same overall
+behaviour. In particular,</p>
+<ol>
+<li>📉 Ease Hell.</li>
+<li>⚡ Short intervals for new cards.</li>
+<li>🔄 Long intervals for mature cards.</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="why"><a class="header" href="#why">Why?</a></h1>
+<p>For most users, <a href="https://docs.ankiweb.net/deck-options.html#fsrs">FSRS</a> is
+<strong>recommended</strong> over the default SM-2 algorithm as it simplifies and reduces the
+amount of configurable parameters, and can adapt very well to a user's review
+history. Anki SRS Kai aims to fill a niche for power users who wish to stick
+with Anki SM-2, but also benefit from the adaptive scheduling algorithm from
+FSRS.</p>
+<p>Some examples for using Anki SRS Kai include:</p>
+<ol>
+<li>Convert optimized FSRS parameters to SM-2 parameters for more efficient
+scheduling than the default SM-2 algorithm and use Ease Reward to deal with
+Ease Hell.</li>
+<li>Implement your own scheduling algorithm based on Anki SM-2.</li>
+<li>Replace the <a href="https://ankiweb.net/shared/info/957961234">Straight Reward</a>
+addon with Ease Reward which allows users to review on mobile without ever
+needing to sync on PC.</li>
+<li>Disable fuzz in the Anki SM-2 algorithm.</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="issues-with-anki-sm-2"><a class="header" href="#issues-with-anki-sm-2">Issues with Anki SM-2</a></h1>
+<p>The issues with the default Anki SuperMemo 2 (SM-2) algorithm are</p>
+<ol>
+<li>Ease Hell</li>
+<li>Short intervals for new cards</li>
+<li>Long intervals for mature cards</li>
+</ol>
+<h2 id="ease-hell"><a class="header" href="#ease-hell">Ease Hell</a></h2>
+<p>At a high level, when calculating the next interval for a review card, Anki SM-2
+performs the calculation:</p>
+<p>\[
+\text{NewInterval} = \text{OldInterval} \times \text{EaseFactor} \times
+\text{IntervalModifier}
+\]</p>
+<p>And pressing the buttons</p>
+<ol>
+<li><strong>Again:</strong> decreases the ease factor by 20%.</li>
+<li><strong>Hard:</strong> decreases the ease factor by 15%.</li>
+<li><strong>Good:</strong> does not affect the ease factor.</li>
+<li><strong>Easy:</strong> increases the ease factor by 15%.</li>
+</ol>
+<p>The only way to increase the ease factor for a card is to press the Easy button.</p>
+<p>Ease Hell is when a card's ease factor keeps decreasing by pressing the Again or
+Hard buttons, and inevitably gets capped at 130%. This means that the card will
+be reviewed unnecessarily very often since the interval grows very slowly.</p>
+<p>Using the Easy button more often can fix this issue, but deciding whether to
+press the Easy button to increase the ease factor or not introduces extra mental
+fatigue while reviewing. Additionally, the ease factor of a card is not shown
+during reviews. Moreover, some users only use the Again and Good buttons (ie,
+Pass/Fail) to reduce mental fatigue. In this case, the ease factor of a card
+will never increase.</p>
+<p>The Anki add-on <a href="https://ankiweb.net/shared/info/957961234">Straight Reward</a>
+addresses this issue by rewarding consecutive successful reviews with an ease
+factor bonus.</p>
+<p>Anki SRS Kai natively implements the Straight Reward algorithm to address this
+issue and has been renamed to <a href="guide/easeReward.html">Ease Reward</a>.</p>
+<p>You can determine if your deck is stuck in Ease Hell by navigating to the
+<strong>Statistics</strong> screen and navigating to the <strong>Card Ease</strong> graph. The image below
+is an example of a deck stuck in Ease Hell where a large portion of the cards
+are stuck at the minimum ease of 130%.</p>
+<p><img src="guide/../images/sm2DifficultyHell.png" alt="SM-2 Ease Hell" /></p>
+<h2 id="short-intervals-for-new-cards"><a class="header" href="#short-intervals-for-new-cards">Short intervals for new cards</a></h2>
+<p>The default <a href="https://docs.ankiweb.net/deck-options.html#graduating-interval">Graduating
+Interval</a> in
+Anki is set to 1, which means a card will always be seen the next day after the
+learning card becomes a review card.</p>
+<p>According to <a href="https://supermemo.guru/wiki/Optimum_interval">SuperMemo</a>,</p>
+<blockquote>
+<p>The first optimum interval for review at retrievability of 90% is 3.96 days.</p>
+</blockquote>
+<p>Additionally, FSRS <a href="https://github.com/open-spaced-repetition/srs-benchmark/blob/45f61b2182c27da83839383ec3b044fa5ae27b47/README.md">benchmarked</a>
+the accuracy of several SRS algorithms on a dataset of roughly 10,000 users.
+FSRS-6 has a very high accuracy rate and was trained on a dataset of
+approximately 10,000 Anki users, which resulted in the default parameters:</p>
+<p>\[
+w = [0.212, 1.2931, 2.3065, 8.2956, \cdots]
+\]</p>
+<p>The optimal first interval for review at retrievability of 90% when pressing
+Good for a new card for the first rating is 2.3065 days. Visit the <a href="https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c">FSRS
+algorithm</a>
+for more details.</p>
+<p>By setting the Graduating Interval to 1, the user is reviewing at a nonoptimal
+time if the target retention is 90%</p>
+<h2 id="long-intervals-for-mature-cards"><a class="header" href="#long-intervals-for-mature-cards">Long intervals for mature cards</a></h2>
+<p>According to <a href="https://supermemo.guru/wiki/Stabilization">SuperMemo</a>,</p>
+<blockquote>
+<p>Memory stabilization (abbreviated \(SInc\) for <em>stability increase</em>) is the
+increase in memory stability as a result of the retrieval of a memory (e.g. in
+review). Stabilization may also be a result of memory optimization in sleep.</p>
+<p><strong>The higher the stability, the lesser the stability increase at review.</strong></p>
+</blockquote>
+<p>Additionally, according to
+<a href="https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c">FSRS</a>,</p>
+<blockquote>
+<p><strong>The larger the value of S, the smaller the SInc value.</strong> This means that the
+higher the stability of the memory, the harder it becomes to make the memory
+even more stable.</p>
+</blockquote>
+<p>Anki SM-2 does not make the increase in interval smaller as the current interval
+gets larger. This means that the card is more likely to be forgotten by the time
+it is reviewed.</p>
+<p>For example, suppose a card has</p>
+<p>\[
+\begin{align}
+\text{OldInterval} &amp;= 1000 \\
+\text{EaseFactor} &amp;= 2.5 \\
+\text{IntervalModifier} &amp;= 1.0 \\
+\end{align}
+\]</p>
+<p>then</p>
+<p>\[
+\begin{align}
+\text{NewInterval} &amp;= \text{OldInterval} \times \text{EaseFactor} \times
+\text{IntervalModifier} \\
+&amp;= 1000 \times 2.5 \times 1.0 \\
+&amp;= 2500
+\end{align}
+\]</p>
+<p>The interval for the card increased from 1000 days (or roughly 2.74 years) to
+2500 days (or roughly 6.85 years). It is very likely that this increase in
+interval is too large for most material and will be forgotten by the time it is
+reviewed.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="fsrs"><a class="header" href="#fsrs">FSRS</a></h1>
+<p>The new <a href="https://docs.ankiweb.net/deck-options.html#fsrs">Free Spaced Repetition Scheduler
+(FSRS)</a> algorithm introduced in
+Anki 23.10 also solves the <a href="guide/issuesWithAnkiSM2.html">issues with Anki-SM2</a> and
+makes it simpler to configure by exposing the <a href="https://docs.ankiweb.net/deck-options.html#desired-retention">Desired
+Retention</a> setting
+instead of modifying SM-2 settings such as <a href="https://docs.ankiweb.net/deck-options.html#graduating-interval">Graduating
+interval</a>, <a href="https://docs.ankiweb.net/deck-options.html#easy-bonus">Easy
+bonus</a>, etc.</p>
+<p>Additionally, the default FSRS-6 parameters are also better than SM-2 for 99.5%
+of users according to the
+<a href="https://github.com/open-spaced-repetition/srs-benchmark/blob/45f61b2182c27da83839383ec3b044fa5ae27b47/README.md">benchmarks</a>,
+which is benchmarked on approximately 10,000 Anki users.</p>
+<p>However, some users are reluctant to make the switch because they would still
+like full control of the SM-2 scheduling algorithm compared to the <a href="https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c">FSRS
+algorithm</a>
+where the desired retention setting is the main configurable parameter, and
+directly modifying the FSRS parameters is generally not advisible since it has
+already been optimized to the user's review history.</p>
+<p>Furthermore, according to the <a href="https://docs.ankiweb.net/deck-options.html#learning-and-relearning-steps">FSRS Learning and Relearning Steps
+docs</a>,
+(re)learning steps should not be greater than or equal to 1 day because</p>
+<blockquote>
+<p>(Re)learning steps of 1 day or greater are not recommended when using FSRS.
+The main reason they were popular with the legacy SM-2 algorithm is because
+repeatedly failing a card after it has graduated from the learning phase could
+reduce its ease a lot, leading to what some people called "ease hell". This is
+not a problem that FSRS suffers from. By keeping your learning steps under a
+day, you will allow FSRS to schedule cards at times it has calculated are
+optimal for your material and memory. Another reason not to use longer
+learning steps is because <strong>FSRS may end up scheduling the first review for a
+shorter time than your last learning step, leading to the Hard button showing
+a longer time than Good.</strong></p>
+<p>We also recommend you keep the number of learning steps to a minimum. Evidence
+shows that repeating a card multiple times in a single day does not
+significantly contribute to long-term memory, so your time is better spent on
+other cards or a shorter study session.</p>
+</blockquote>
+<p>As a result, some users still wish to have (re)learning steps greater than or
+equal to 1 day and hence stick with the default Anki SM-2 algorithm.</p>
+<h2 id="ease-hell-1"><a class="header" href="#ease-hell-1">Ease Hell</a></h2>
+<p>FSRS-6 addresses Ease Hell (ie, Difficulty Hell) by applying <a href="https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c">mean
+reversion</a>
+to the new difficulty value after review. This implies that a card's difficulty
+would converge to the average difficulty over time.</p>
+<p>However, it is possible that even with optimized parameters, it may take
+<strong>thousands</strong> of reviews before a card converges back to the average difficulty.</p>
+<p>In particular, the next difficulty value after review with mean reversion
+applied is calculated as</p>
+<p>\[
+D'' = w_7 \cdot D_0(4) + (1 - w_7) \cdot D'
+\]</p>
+<p>The target value of the mean reversion is \(D_0(4)\), which is the initial
+difficulty when the first rating is Easy, and is calculated as</p>
+<p>\[
+\begin{align}
+D_0(G) &amp;= w_4 - e^{w_5 \cdot (G - 1)} + 1 \\
+D_0(4) &amp;= w_4 - e^{w_5 \cdot (4 - 1)} + 1 \\
+&amp;= w_4 - e^{w_5 \cdot 3} + 1
+\end{align}
+\]</p>
+<p>The next difficulty value after review is calculated as</p>
+<p>\[
+\begin{align}
+\Delta D(G) &amp;= -w_6 \cdot (G - 3) \\
+D'          &amp;= D + \Delta D \cdot \frac{10 - D}{9}
+\end{align}
+\]</p>
+<p>And the default parameters for FSRS-6 is</p>
+<pre><code>w = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722,
+0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912,
+0.0658, 0.1542]
+</code></pre>
+<p>Suppose we have an extremely difficult card where \(D = 10\), and we always
+press the Good button where \(G = 3\). Then for the first review, we have</p>
+<p>\[
+\begin{align}
+D'' &amp;= w_7 \cdot D_0(4) + (1 - w_7) \cdot D' \\
+&amp;= w_7 \cdot D_0(4) + (1 - w_7) \cdot \left( D + \Delta D \cdot \frac{10 - D}{9} \right) \\
+&amp;= w_7 \cdot D_0(4) + (1 - w_7) \cdot \left( D + (-w_6 \cdot (G - 3)) \cdot \frac{10 - D}{9} \right) \\
+&amp;= w_7 \cdot D_0(4) + (1 - w_7) \cdot \left( 10 + (-w_6 \cdot (3 - 3)) \cdot \frac{10 - 10}{9} \right) \\
+&amp;= w_7 \cdot D_0(4) + (1 - w_7) \cdot (10 + (-w_6 \cdot 0) \cdot 0) \\
+&amp;= w_7 \cdot D_0(4) + (1 - w_7) \cdot 10 \\
+&amp;= w_7 \cdot (w_4 - e^{w_5 \cdot 3} + 1) + (1 - w_7) \cdot 10 \\
+&amp;= w_7 \cdot (6.4133 - e^{0.8334 \cdot 3} + 1) + (1 - w_7) \cdot 10 \\
+&amp;= w_7 \cdot −4.771630703 + (1 - w_7) \cdot 10 \\
+&amp;= 0.001 \cdot −4.771630703 + (1 - 0.001) \cdot 10 \\
+&amp;= 0.001 \cdot −4.771630703 + 0.999 \cdot 10 \\
+&amp;= −0.004771631 + 9.99 \\
+&amp;= 9.985228369 \\
+\end{align}
+\]</p>
+<p>We can calculate this automatically by using some code.</p>
+<details>
+<summary>Calculate the number of times to go from a difficulty of 10 to 9 by
+        only pressing the Good button</summary>
+<pre><code>pip install --quiet fsrs==6.1.1
+</code></pre>
+<pre><code class="language-python">import fsrs
+
+
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+desired_retention = 0.90
+
+
+scheduler = fsrs.Scheduler(
+    parameters = parameters,
+    desired_retention = desired_retention,
+    maximum_interval = 36500,
+)
+
+n = 0
+difficulty = 10.0
+target_difficulty = 9
+print(f"target difficulty: {target_difficulty}")
+while difficulty &gt;= target_difficulty:
+        difficulty = scheduler._next_difficulty(difficulty=difficulty, rating=fsrs.Rating.Good)
+        n += 1
+        print(f"{n}: {difficulty}")
+</code></pre>
+<pre><code>target difficulty: 9
+1: 9.991
+2: 9.982009
+3: 9.973026991
+4: 9.964053964008999
+5: 9.95508991004499
+...
+117: 9.005798073105412
+118: 8.997792275032307
+</code></pre>
+</details>
+<p>We see that it takes 118 reviews pressing the Good button in a row before it
+reaches a difficulty of 9.</p>
+<p>Furthermore, we can calculate how many reviews it will take to go from a
+difficulty of 10 to the initial difficulty when the first rating is Easy (the
+target difficulty that every card will converge to in FSRS-6).</p>
+<details>
+<summary>Calculate the number of times to go from a difficulty of 10 to the
+        initial difficulty when the first rating is Easy by only pressing the
+        Good button</summary>
+<pre><code>pip install --quiet fsrs==6.1.1
+</code></pre>
+<pre><code class="language-python">import fsrs
+
+
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+desired_retention = 0.90
+
+
+scheduler = fsrs.Scheduler(
+    parameters = parameters,
+    desired_retention = desired_retention,
+    maximum_interval = 36500,
+)
+
+n = 0
+difficulty = 10.0
+target_difficulty = scheduler._initial_difficulty(rating=fsrs.Rating.Easy)
+print(f"target difficulty: {target_difficulty}")
+while difficulty &gt;= target_difficulty:
+        difficulty = scheduler._next_difficulty(difficulty=difficulty, rating=fsrs.Rating.Good)
+        n += 1
+        print(f"{n}: {difficulty}")
+</code></pre>
+<pre><code>target difficulty: 1.0
+1: 9.991
+2: 9.982009
+3: 9.973026991
+4: 9.964053964008999
+5: 9.95508991004499
+...
+6798: 1.0100099398929248
+6799: 1.0099999299530318
+</code></pre>
+</details>
+<p>We see that it takes almost 7000 reviews before it reaches the target
+difficulty.</p>
+<p>In other words, <strong>the smaller the value \(w_7\) is, the longer it will take for a
+card to exit Difficulty Hell</strong>.</p>
+<p>The effects of having a difficult card can be calculated with the code below.</p>
+<details>
+<summary>Calculate the next interval for a card with a difficulty of
+        10.0</summary>
+<pre><code>pip install --quiet fsrs==6.1.1
+</code></pre>
+<pre><code class="language-python">import fsrs
+
+
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+desired_retention = 0.90
+
+difficulty = 10.0
+stability = 100.0
+retrievability = 0.90
+
+scheduler = fsrs.Scheduler(
+    parameters = parameters,
+    desired_retention = desired_retention,
+    maximum_interval = 36500,
+)
+
+next_stability = scheduler._next_stability(difficulty=difficulty, stability=stability, retrievability=retrievability, rating=fsrs.Rating.Good)
+next_interval = scheduler._next_interval(stability=next_stability)
+print(f"Next recall stability: {next_stability}")
+print(f"Next interval: {next_interval}")
+</code></pre>
+<pre><code>Next recall stability: 125.01489980658735
+Next interval: 125
+</code></pre>
+</details>
+<p>For a card with a difficulty of 10.0, stability (interval) of 100 days,
+retrievability of 90%, and desired retention of 90% using the default FSRS-6
+parameters, the next interval is 125 days.</p>
+<details>
+<summary>Calculate the next interval for a card with a difficulty of
+        5.0</summary>
+<pre><code>pip install --quiet fsrs==6.1.1
+</code></pre>
+<pre><code class="language-python">import fsrs
+
+
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+desired_retention = 0.90
+
+difficulty = 5.0
+stability = 100.0
+retrievability = 0.90
+
+scheduler = fsrs.Scheduler(
+    parameters = parameters,
+    desired_retention = desired_retention,
+    maximum_interval = 36500,
+)
+
+next_stability = scheduler._next_stability(difficulty=difficulty, stability=stability, retrievability=retrievability, rating=fsrs.Rating.Good)
+next_interval = scheduler._next_interval(stability=next_stability)
+print(f"Next recall stability: {next_stability}")
+print(f"Next interval: {next_interval}")
+</code></pre>
+<pre><code>Next recall stability: 250.08939883952408
+Next interval: 250
+</code></pre>
+</details>
+<p>In contrast, for a card with a difficulty of 5.0, stability (interval) of 100
+days, retrievability of 90%, and desired retention of 90% using the default
+FSRS-6 parameters, the next interval is 250 days.</p>
+<p>In this case, the card with a difficulty of 10.0 has its interval reduced by
+2x compared to the card with a difficulty of 5.0. This is an issue because if
+a card was previously difficult, but became easier via increased repetitions and
+better memory encoding of the material, then the user will be doing more reviews
+than necessary, resulting in an <strong>increased workload</strong>.</p>
+<p>Additionally, with the default FSRS-6 parameters, a card with a difficulty of
+5.0 only takes pressing the Again button 2 times before it reaches a difficulty
+of 9.45.</p>
+<details>
+<summary>Calculate the number of times to go from a difficulty of 5 to
+        9</summary>
+<pre><code>pip install --quiet fsrs==6.1.1
+</code></pre>
+<pre><code class="language-python">import fsrs
+
+
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+desired_retention = 0.90
+
+
+scheduler = fsrs.Scheduler(
+    parameters = parameters,
+    desired_retention = desired_retention,
+    maximum_interval = 36500,
+)
+
+n = 0
+difficulty = 5
+target_difficulty = 9
+print(f"target difficulty: {target_difficulty}")
+while difficulty &lt;= target_difficulty:
+        difficulty = scheduler._next_difficulty(difficulty=difficulty, rating=fsrs.Rating.Again)
+        n += 1
+        print(f"{n}: {difficulty}")
+</code></pre>
+<pre><code>target difficulty: 9
+1: 8.347534
+2: 9.447845662568799
+</code></pre>
+</details>
+<p>This scenario is not limited to pressing the Again button 2 times in a row. It
+is possible to enter Difficulty Hell with the Again -&gt; Good -&gt; Again -&gt; Good
+loop. If \(w_7\) is close to 0, it will take many reviews pressing the Good
+button before the card exits Difficulty Hell.</p>
+<p>Whether the mean reversion in FSRS or the Straight Rewards addon for SM-2 is
+actually effective is still under research, but given that FSRS-6 is optimized
+on the review history of 10,000 users and found that \(w_7\) to be near
+\(0\) seems to indicate that it is not as effective as one may hope. However,
+with Straight Rewards, it is possible for a card to exit Ease Hell (Difficulty
+Hell) much quicker with user defined values.</p>
+<p>Additionally, for some users, after optimizing their deck with optimal
+parameters, \( w_7 \) may be 0 or close to 0, making the mean reversion
+algorithm virtually nonexistent. Also, manually modifying this value for most
+users is generally not recommended, since the parameters have been specifically
+chosen for optimal results. Moreover, it goes against the design and simplicity
+of the FSRS algorithm. Ideally, the only parameter the user should configure is
+the <a href="https://docs.ankiweb.net/deck-options.html#desired-retention">Desired
+Retention</a>
+setting.</p>
+<p>Using the Easy button more often can fix this issue, but deciding whether to
+press the Easy button to decrease the difficulty or not introduces extra mental
+fatigue while reviewing. Additionally, the difficulty of a card is not shown
+during reviews. Moreover, some users only use the Again and Good buttons (ie,
+Pass/Fail) to reduce mental fatigue. In this case, the difficulty of a card
+will require many reviews pressing the Good button before it exits Difficulty
+Hell if \(w_7\) is close to 0.</p>
+<p>You can determine if your deck is stuck in Difficulty Hell by navigating to the
+<strong>Statistics</strong> screen, scrolling down to the <strong>Card Difficulty</strong> graph, and
+seeing if your \(w_7\) parameter is close to 0. The image below is an example
+of a deck stuck in Difficulty Hell where most of the cards are stuck at 100%
+difficulty, and the user's \(w_7\) parameter is \(0.0010\) which means a
+card will take a long time to exit difficulty hell.</p>
+<p><img src="guide/../images/fsrsDifficultyHell.png" alt="FSRS Difficulty Hell" /></p>
+<h2 id="short-intervals-for-new-cards-1"><a class="header" href="#short-intervals-for-new-cards-1">Short intervals for new cards</a></h2>
+<p>FSRS-6 addresses the short intervals for new cards issue by optimizing on a
+user's collection and determining the best initial stability (interval when
+retrievability is 90%) for each rating (Again, Hard, Good, and Easy). That is,
+the initial stability after the first rating is calculated as</p>
+<p>\[
+S_0(G) = w_{G - 1}
+\]</p>
+<p>where \(G = 1\) is pressing the Again button, \(G = 2\) is pressing the Hard
+button, \(G = 3\) is pressing the Good button, and \(G = 4\) is pressing the
+Easy button.</p>
+<p>With the default parameters,</p>
+<pre><code>w = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722,
+0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912,
+0.0658, 0.1542]
+</code></pre>
+<p>we have</p>
+<p>\[
+\begin{align}
+S_0(1) &amp;= 0.212 \\
+S_0(2) &amp;= 1.2931 \\
+S_0(3) &amp;= 2.3065 \\
+S_0(4) &amp;= 8.2956 \\
+\end{align}
+\]</p>
+<p>This implies that the first rating that is chosen for the first learning step
+will determine the card's interval when it graduates to a review card.</p>
+<p>For example, for a deck with learning steps <code>1m 10m</code> and the first rating is
+Good on the first learning step of <code>1m</code>, then when the card has graduated, it
+will have an interval of 2 days (rounded down from 2.3065).</p>
+<p>There is no direct equivalent in Anki SM-2 for this behaviour, but the closest
+is the <a href="https://docs.ankiweb.net/deck-options.html#graduating-interval">Graduating
+interval</a> and
+<a href="https://docs.ankiweb.net/deck-options.html#easy-interval">Easy interval</a>.</p>
+<h2 id="long-intervals-for-mature-cards-1"><a class="header" href="#long-intervals-for-mature-cards-1">Long intervals for mature cards</a></h2>
+<p>FSRS-6 addresses the long intervals for mature cards issue with the following
+formula</p>
+<p>\[
+S^\prime_r(D,S,R,G) = S \cdot (e^{w_8} \cdot (11-D) \cdot S^{-w_9} \cdot (e^{w_{10}\cdot(1-R)}-1) \cdot w_{15}(\textrm{if G = 2}) \cdot w_{16}(\textrm{if G = 4}) + 1)
+\]</p>
+<p>According to the <a href="https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c">FSRS algorithm
+wiki</a>,</p>
+<blockquote>
+<p>Let \(SInc\) (the increase in stability) denotes \(\frac{S^{'}_{r}(D, S,
+R, G)}{S}\) which is equivalent to Anki's ease factor.</p>
+<ol>
+<li>The larger the value of D , the smaller the \(SInc\) value. This means
+that the increase in memory stability for difficult material is smaller
+than for easy material.</li>
+<li>The larger the value of S , the smaller the \(SInc\) value. This
+means that <strong>the higher the stability of the memory, the harder it becomes
+to make the memory even more stable.</strong></li>
+<li>The smaller the value of R, the larger the \(SInc\) value. This means
+that the spacing effect accumulates over time.</li>
+<li>The value of \(SInc\) is always greater than or equal to 1 if the review
+was
+successful.</li>
+</ol>
+</blockquote>
+<p>Furthermore, the formula above is a more sophisticated algorithm than SM-2 for
+handling cards that are past its due date or reviewed early. In particular, the
+retrievability of a card is calculated as</p>
+<p>\[
+R(t, S) = \left( 1 + factor \cdot \frac{t}{S} \right)^{-w_{20}}
+\]</p>
+<p>where \(t\) is the number of days since the last review, \(S\) is the
+stability (interval when probability of recall is 90%), and
+\(factor = 0.9^{-\frac{1}{w_{20}}} - 1\).</p>
+<p>In other words, FSRS can accurately predict the retrievability of a card when it
+is reviewed, whether it is early or late. In contrast, Anki SM-2 does not
+predict the retrievability of a card. When a card is reviewed past its due date,
+the formula becomes</p>
+<p>\[
+\text{NewInterval} = \left(\text{OldInterval} + \frac{DaysLate}{2}\right) \times
+\text{EaseFactor} \times \text{IntervalModifier}
+\]</p>
+<p>The formula for reviewing a card early in Anki SM-2 is also similar and is
+omitted.</p>
+<h2 id="post-lapse-stability"><a class="header" href="#post-lapse-stability">Post-lapse stability</a></h2>
+<p>When a card is forgotten and relearned, FSRS will retain a portion of the
+current interval. The formula is calculated by</p>
+<p>\[
+S'_{f}(D,S,R) = w_{11} \cdot D^{-w_{12}} \cdot ((S+1)^{w_{13}} - 1) \cdot
+e^{w_{14} \cdot (1 - R)}
+\]</p>
+<p>For example, if a card has an interval of \(S = 1000\) days with \( D = 5 \)
+and \( R = 0.9 \) and default FSRS-6 parameters \(w = [ \cdots, 1.4835, 0.0614, 0.2629, 1.6483, \cdots ]\), then</p>
+<p>\[
+\begin{align}
+S'_{f}(5,1000,0.9) &amp;= 1.4835 \cdot 5^{-0.0614} \cdot ((1000+1)^{0.2629} - 1) \cdot
+e^{1.6483 \cdot (1 - 0.9)} \\
+&amp;\approx 8.16
+\end{align}
+\]</p>
+<p>Forgetting and relearning a card will preserve part of the card's interval.
+While preserving a card's interval might make sense since the material has not
+been completely forgotten, SuperMemo has found that it is
+<a href="https://supermemo.guru/wiki/Post-lapse_stability">harmful</a>, since it slows down
+the identification of leeches. They state</p>
+<blockquote>
+<p>Post-lapse stability (PLS) is the stability after a review with a failing
+grade. Unlike stability computed after a successful repetition, post-lapse
+stability cannot be derived from the SInc matrix.</p>
+<p>In the ideal case, for simple memories, forgetting results in a reset of
+estimated stability back to near-zero. In theory, only difficult items made of
+composite memories may show a substantial decrease in the costs of
+re-learning, however, even that does not show in data.</p>
+<p>It has been shown long ago that the length of the first post-lapse optimum
+interval is best correlated with the number of memory lapses recorded for the
+item. Even then, <strong>post-lapse interval usually oscillates in the range of 1-4
+days for the default forgetting index of 10%</strong>. The correlation between lapses
+and the PLS is not very useful in adding to the efficiency of learning. Some
+competitive spaced repetition software, as well as SuperMemo in its first
+years, experimented with re-learning hypotheses based on ancient wisdoms of
+psychology, e.g. by halving intervals after a memory lapse. <strong>Current data
+shows clearly that this approach is harmful, as it slows down the
+identification of leeches.</strong> Such an approach to handling forgotten items is a
+form of irrational procrastination.</p>
+</blockquote>
+<p>In Anki, the <a href="https://docs.ankiweb.net/deck-options.html#new-interval">New
+Interval</a> setting is
+similar and can be used to preserve part of the card's interval, but they also
+recommend to leave it at 0.00 for the same reasons above.</p>
+<p>For some users, preserving the card's interval may not be desirable but is
+likely to not know that this behaviour exists without looking into understanding
+how the algorithm works. While one can set \( w_{11} = 0 \) to turn this
+behaviour off, this is generally not recommended for the same reasons above in
+the <a href="guide/fsrs.html#ease-hell">Ease Hell</a> section</p>
+<p>The SuperMemo and <a href="https://github.com/open-spaced-repetition/srs-benchmark/blob/45f61b2182c27da83839383ec3b044fa5ae27b47/README.md">FSRS
+benchmark</a> data
+currently conflict as to which is the best approach here, and more research is
+most likely required before a conclusion can be drawn.</p>
+<h2 id="potential-issues-with-optimizing"><a class="header" href="#potential-issues-with-optimizing">Potential issues with optimizing</a></h2>
+<p>While the optimizer can optimize your parameters in order to reach the desired
+retention and make the scheduling more efficient and reduce a user's workload,
+it can be a double edged sword. Instead of fixing the root cause of the issue,
+it may encourage users to continue their bad habits and increase their workload,
+losing any efficiency that would have been gained by switching from Anki SM-2 to
+FSRS.</p>
+<h3 id="poor-encoding-and-card-formulation"><a class="header" href="#poor-encoding-and-card-formulation">Poor encoding and card formulation</a></h3>
+<p>If the encoding of the information to be learned and reviewed is poor, then it
+will be difficult to recall the information. <a href="https://super-memory.com/articles/20rules.htm">SuperMemo's 20 rules of formulating
+knowledge</a> goes into detail on
+how to address this and is <strong>highly recommended</strong> to be read in order to use
+Anki effectively. Some important points are</p>
+<blockquote>
+<ul>
+<li>Do not learn if you do not understand</li>
+<li>Learn before you memorize</li>
+<li>Stick to the minimum information principle</li>
+<li>Use imagery</li>
+<li>Use mnemonic techniques</li>
+<li>Graphic deletion is as good as cloze deletion</li>
+<li>Combat interference</li>
+<li>Optimize wording</li>
+<li>Personalize and provide examples</li>
+<li>Rely on emotional states</li>
+<li>Redundancy does not contradict minimum information principle</li>
+</ul>
+</blockquote>
+<p>Some points have been omitted for brevity but are as equally important.</p>
+<p>As a result of poor encoding and card formulation, a card will be extremely
+difficult to recall which will consequently lower the retention rate of a user's
+deck. If the retention rate is low (for example, below 80%) and the user has a
+desired retention of 90%, then the optimized parameters and algorithm will
+suggest shorter intervals in order to reach a retention of 90%, without the user
+fixing the actual issue that caused the low retention rate in the first place.
+In this case, the user's workload has increased due to the suggested shorter
+intervals after optimizing their parameters.</p>
+<h3 id="accidentally-making-review-cards-more-difficult"><a class="header" href="#accidentally-making-review-cards-more-difficult">Accidentally making review cards more difficult</a></h3>
+<p>During review, a user may test themselves and unintentionally make the card
+harder than it should.</p>
+<p>For example, when reviewing a monolingual Japanese vocabulary card where the
+front contains the word to be recalled in kanji, and its reading and Japanese
+definition on the back, the user may test themselves by checking if they can
+regurgitate the Japanese definition word for word. This is an extremely
+difficult task and makes the card harder to review than it should.</p>
+<p>In this scenario, to make it easier to review, the user can test themselves by
+recalling an image if the word is a concrete noun. The benefit of this is that
+less time is spent on the card during review and makes it easier to recall. For
+words that are not concrete nouns, recalling the gist of the definition and
+being lenient with the grading process makes the card less difficult to review.
+Furthermore, converting the vocabulary card into a sentence card can also help
+make the card less difficult to review.</p>
+<p>This is mainly an extension of the minimum information principle but deserves
+special mention. For the same reasons above, if the root cause of the issue is
+not fixed, the algorithm will simply optimize and suggest shorter intervals and
+increase the workload in order to reach the desired retention, encouraging the
+user to continue making the card difficult to review.</p>
+<h3 id="using-the-hard-button-incorrectly"><a class="header" href="#using-the-hard-button-incorrectly">Using the hard button incorrectly</a></h3>
+<p>According to the <a href="https://docs.ankiweb.net/deck-options.html#fsrs">Anki FSRS
+docs</a>,</p>
+<blockquote>
+<p>FSRS can adapt to almost any habit, except for one: pressing "Hard" instead of
+"Again" when you forget the information. When you press "Hard", FSRS assumes
+you have recalled the information correctly (though with hesitation and a lot
+of mental effort). <strong>If you press "Hard" when you have failed to recall the
+information, all intervals will be unreasonably high.</strong> So, if you have this
+habit, please change it and use "Again" when you forget the information.</p>
+</blockquote>
+<p>In other words, only the Again button is treated as a fail, and the Hard, Good,
+and Easy buttons are treated as a Pass. This means that if the user never
+presses Again, their retention rate will be very high (near 99%) and the
+optimizer will suggest parameters that gives extremely high intervals upon
+review in order to reach the user's configured desired retention.</p>
+<p>In this case, the suggested intervals are extremely high which make recalling
+the information difficult. This leads to failing the card often and inevitably
+increase the workload.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
+<p><strong>IMPORTANT:</strong> Modifying the custom scheduler <strong>affects the whole collection</strong>,
+<strong>regardless of the deck options preset</strong>. This means the custom scheduler will
+affect all of your decks.</p>
+<p>To install Anki SRS Kai:</p>
+<ol>
+<li>Download the
+<a href="https://github.com/kuroahna/anki_srs_kai/releases">anki_srs_kai.js</a> custom
+scheduler.</li>
+<li>Open up the <strong>Options</strong> page for any deck.</li>
+<li>Scroll down to the <strong>Advanced</strong> section, under <strong>Custom scheduling</strong>, paste
+the custom scheduler code in the textbox.</li>
+<li>Follow the <a href="guide/configuration.html">Configuration</a> section.</li>
+<li>Click on the <strong>Save</strong> button.</li>
+</ol>
+<h2 id="uninstall"><a class="header" href="#uninstall">Uninstall</a></h2>
+<p>To uninstall Anki SRS Kai:</p>
+<ol>
+<li>Open up the <strong>Options</strong> page for any deck.</li>
+<li>Scroll down to the <strong>Advanced</strong> section, under <strong>Custom scheduling</strong>, delete
+the custom scheduler code.</li>
+<li>Click on the <strong>Save</strong> button.</li>
+</ol>
+<p>You can now use Anki's native scheduler (SM-2 or FSRS).</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="configuration"><a class="header" href="#configuration">Configuration</a></h1>
+<p>The default deck options are</p>
+<pre><code class="language-javascript">const deckOptions = {
+    "deck1": {
+        easeReward: {
+            minimumConsecutiveSuccessfulReviewsRequiredForReward: 3,
+            baseEaseReward: 0.05,
+            stepEaseReward: 0.05,
+            minimumEase: 1.30,
+            maximumEase: 2.50,
+        },
+        scheduler: {
+            enableFuzz: true,
+            maximumInterval: 36500,
+            intervalModifier: 1.00,
+            calculateHardMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return 0.0;
+            },
+            calculateGoodMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return currentEaseFactor / Math.pow(currentInterval, 0.054297);
+            },
+            calculateEasyMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return 0.0;
+            },
+        },
+    },
+    "Global Settings": {
+        easeReward: {
+            minimumConsecutiveSuccessfulReviewsRequiredForReward: 3,
+            baseEaseReward: 0.05,
+            stepEaseReward: 0.05,
+            minimumEase: 1.30,
+            maximumEase: 2.50,
+        },
+        scheduler: {
+            enableFuzz: true,
+            maximumInterval: 36500,
+            intervalModifier: 1.00,
+            // Approximation of the default FSRS-6 parameters
+            // [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+            calculateHardMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return currentEaseFactor * Math.pow(currentInterval, -0.077098162) + (0.144440985);
+            },
+            calculateGoodMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return currentEaseFactor * Math.pow(currentInterval, -0.182458510) + (1.779479164);
+            },
+            calculateEasyMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return currentEaseFactor * Math.pow(currentInterval, -0.183552566) + (3.407921198);
+            },
+        },
+    },
+};
+</code></pre>
+<p>Each deck can be configured individually by adding a new top level entry in
+<code>deckOptions</code> with the name of the deck you want to configure.</p>
+<p>The <code>easeReward</code> and <code>scheduler</code> fields, along with their corresponding
+settings, must be correctly configured. Any typos or omitted fields will cause
+the custom scheduler to fallback to Anki's native scheduler, either SM-2 or
+FSRS, whichever has been enabled for the deck options preset.</p>
+<p>The <code>Global Settings</code> entry serves as a fallback configuration for any decks
+that do not match the name of a specified deck. If <code>Global Settings</code> is removed
+from <code>deckOptions</code>, Anki will revert to using its native scheduler, either SM-2
+or FSRS, based on the enabled preset.</p>
+<p>Any subdecks under a parent deck will not inherit its options from the parent
+deck. A separate top level entry must be created in order for the custom
+scheduler to take effect. Otherwise, it will be scheduled using the settings
+configured in <code>Global Settings</code> if present. For example, if there is a parent
+deck called <code>parentDeck</code> and a subdeck called <code>subDeck</code>, then the top level
+entry should be named <code>parentDeck::subDeck</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ease-reward"><a class="header" href="#ease-reward">Ease Reward</a></h1>
+<p>Ease reward works exactly the same as the <a href="https://ankiweb.net/shared/info/957961234">Straight
+Reward</a> addon with the added benefit
+of being directly incorporated in the custom scheduler. This means that ease
+rewards are applied immediately upon review without having to sync on PC when
+reviewing on mobile. Only review cards are affected. Reviewing cards early
+(cramming), new cards, learning cards, and relearning cards are not affected.</p>
+<p>The ease factor of a card is increased when the Good or Easy button has been
+pressed consecutively. Pressing the Good or Easy button is considered as a
+successful review. Pressing the Hard button is not considered as a successful
+review, but pressing it will not reset the current streak back to 0. Pressing
+the Again button will reset the current streak back to 0.</p>
+<h2 id="algorithm"><a class="header" href="#algorithm">Algorithm</a></h2>
+<p>Let \(b\) represent the base ease reward, \(s\) represent the step ease
+reward, \(x\) represent the current number of consecutive successful reviews
+(ie, the current streak), and \(m\) represent the minimum consecutive
+successful reviews required for reward.</p>
+<p>Then if \(x &gt;= m\), the ease factor of the card will increase by the following
+formula</p>
+<p>\[
+b + s \cdot (x - m)
+\]</p>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<ol>
+<li>The card has been rated Good for the 6th time in a row.</li>
+<li>The card currently has an ease factor of 250%.</li>
+<li>The minimum consecutive successful reviews required for reward is set to 4.</li>
+<li>The base ease reward is set to 15%.</li>
+<li>The step ease reward is set to 5%.</li>
+<li>The minimum ease is set to 130%.</li>
+<li>The maximum ease is set to 270%.</li>
+</ol>
+<p>Since the current streak is 6 and the minimum streak required is 4, we have
+\(x &gt;= m\), so the card's ease factor will increase by</p>
+<p>\[
+\begin{align}
+&amp;b + s \cdot (x - m) \\
+&amp;= 15\% + 5\% \cdot (6 - 4) \\
+&amp;= 15\% + 10\% \\
+&amp;= 25\%
+\end{align}
+\]</p>
+<p>which is \(250\% + 25\% = 275\%\). However, since the maximum ease is
+\(270\%\), then the ease of card will be set to \(270\%\).</p>
+<h2 id="default-configuration"><a class="header" href="#default-configuration">Default configuration</a></h2>
+<pre><code class="language-javascript">easeReward: {
+    minimumConsecutiveSuccessfulReviewsRequiredForReward: 3,
+    baseEaseReward: 0.05,
+    stepEaseReward: 0.05,
+    minimumEase: 1.30,
+    maximumEase: 2.50,
+},
+</code></pre>
+<h2 id="minimum-consecutive-successful-reviews-required-for-reward"><a class="header" href="#minimum-consecutive-successful-reviews-required-for-reward">Minimum consecutive successful reviews required for reward</a></h2>
+<p>The number of successful reviews required in a streak before the ease reward is
+applied. Set this to 0 to disable ease reward.</p>
+<h2 id="base-ease-reward"><a class="header" href="#base-ease-reward">Base ease reward</a></h2>
+<p>Specifies the initial ease reward as a percentage. For example, a value of
+<code>0.05</code> represents an increase in the ease factor by 5%.</p>
+<h2 id="step-ease-reward"><a class="header" href="#step-ease-reward">Step ease reward</a></h2>
+<p>Specifies the additional ease reward as a percentage for each consecutive
+successful review in the streak. For example, a value of <code>0.05</code> represents a 5%
+increase in ease per streak step.</p>
+<h2 id="minimum-ease"><a class="header" href="#minimum-ease">Minimum ease</a></h2>
+<p>Ease rewards are only applied to cards with an ease factor greater than or equal
+to the minimum ease. For example, a value of <code>1.30</code> represents an ease factor of
+130%. Any card with an ease factor less than 130% will be ignored.</p>
+<h2 id="maximum-ease"><a class="header" href="#maximum-ease">Maximum ease</a></h2>
+<p>Ease rewards are only applied to cards with an ease factor less than or equal
+to the maximum ease. For example, a value of <code>2.50</code> represents an ease factor of
+250%. Any card with an ease factor greater than 250% will be ignored.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="migrating-from-the-straight-reward-add-on"><a class="header" href="#migrating-from-the-straight-reward-add-on">Migrating from the Straight Reward add-on</a></h1>
+<p>To migrate from the <a href="https://ankiweb.net/shared/info/957961234">Straight Reward</a>
+add-on, install the <a href="https://ankiweb.net/shared/info/501472260">AnkiSRSKai: Straight Reward to Ease
+Reward</a> add-on.</p>
+<ol>
+<li>In Anki, click on the <strong>Tools</strong> button in the toolbar.</li>
+<li>Click on the <strong>Add-ons</strong> button.</li>
+<li>Click on the <strong>Get Add-ons...</strong> button.</li>
+<li>Input <code>501472260</code> in the <strong>Code:</strong> textbox.</li>
+<li>Click on the <strong>OK</strong> button.</li>
+<li>Close the <strong>Add-ons</strong> window.</li>
+<li>Click on the <strong>Tools</strong> button in the toolbar.</li>
+<li>Click on the <strong>AnkiSrsKai: Update cards with consecutive successful review
+counts</strong> button.</li>
+</ol>
+<p>Every card in your collection should now be updated with the correct streak
+counts. This can be verified by opening the <strong>Card Browser</strong> by clicking on
+<strong>Browse</strong>, right clicking on a card, clicking <strong>Info...</strong>, and confirming that
+the <strong>Custom Data</strong> with the <strong>c</strong> key has the correct value based on the card's
+review history.</p>
+<p>The Straight Reward to Anki SRS Kai add-on can now be <strong>uninstalled</strong> since the
+custom scheduler can keep track of your streak without the use of an add-on.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="scheduler"><a class="header" href="#scheduler">Scheduler</a></h1>
+<p>The scheduler is the same exact implementation as the Anki SM-2 algorithm.
+However, only review cards are affected. Reviewing cards early (cramming),
+new cards, learning cards, and relearning cards are not affected and will
+default to the native Anki scheduler, either SM-2 or FSRS.</p>
+<p>The main difference is that scheduler extends the notion of the ease factor in
+Anki SM-2 by converting it from a scalar value to a mathematical function based
+on two parameters, the current ease factor and the current interval of the card.
+This addresses the <a href="guide/issuesWithAnkiSM2.html#long-intervals-for-mature-cards">long intervals for mature cards issue with Anki
+SM-2</a>.</p>
+<p>The next interval for a card upon review is calculated with the following
+formula</p>
+<p>\[
+\text{NewInterval} = \text{OldInterval} \times \text{EaseFactor} \times
+\text{IntervalModifier}
+\]</p>
+<h2 id="default-configuration-1"><a class="header" href="#default-configuration-1">Default configuration</a></h2>
+<pre><code class="language-javascript">scheduler: {
+    enableFuzz: true,
+    maximumInterval: 36500,
+    intervalModifier: 1.00,
+    // Approximation of the default FSRS-6 parameters
+    // [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+    calculateHardMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.077098162) + (0.144440985);
+    },
+    calculateGoodMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.182458510) + (1.779479164);
+    },
+    calculateEasyMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.183552566) + (3.407921198);
+    },
+},
+</code></pre>
+<h2 id="enable-fuzz"><a class="header" href="#enable-fuzz">Enable fuzz</a></h2>
+<p>According to the <a href="https://docs.ankiweb.net/studying.html#fuzz-factor">Anki
+docs</a>,</p>
+<blockquote>
+<p>When you select an answer button on a review card, Anki also applies a small
+amount of random “fuzz” to prevent cards that were introduced at the same time
+and given the same ratings from sticking together and always coming up for
+review on the same day.</p>
+<p>Learning cards are also given up to 5 minutes of extra delay so that they
+don’t always appear in the same order, but answer buttons won't reflect that.
+It is not possible to turn this feature off.</p>
+</blockquote>
+<p>Set this to <code>true</code> to enable fuzzing. Otherwise, set to <code>false</code> to disable
+fuzzing.</p>
+<p>The custom scheduler allows the user to disable fuzzing, whereas Anki SM-2 does
+not. It is <strong>recommended</strong> to set this value to <code>true</code> to prevent cards from
+sticking together and coming up for review on the same day.</p>
+<h2 id="maximum-interval"><a class="header" href="#maximum-interval">Maximum interval</a></h2>
+<p>According to the <a href="https://docs.ankiweb.net/deck-options.html#maximum-interval">Anki
+docs</a>,</p>
+<blockquote>
+<p>The maximum number of days a review card will wait before it's shown again.
+When reviews have reached the limit, Hard, Good and Easy will all give the
+same delay. The shorter you set this, the greater your workload will be. The
+default is 100 years; you can decrease this to a smaller number if you’re
+willing to trade extra study time for higher retention.</p>
+</blockquote>
+<p><strong>IMPORTANT:</strong> Since the scheduler only affects review cards, the maximum
+interval setting in the deck options preset in the Anki UI has no effect for
+review cards. Please copy the maximum interval setting for the deck here.</p>
+<h2 id="interval-modifier"><a class="header" href="#interval-modifier">Interval modifier</a></h2>
+<p>According to the <a href="https://docs.ankiweb.net/deck-options.html#interval-modifier">Anki
+docs</a>,</p>
+<blockquote>
+<p>An extra multiplier that is applied to all reviews. At its default of 1.00 it
+does nothing. If you set it to 0.80, intervals will be generated at 80% of
+their normal size (so a 10 day interval would become 8 days). You can You can
+thus use the multiplier to to make your reviews less or more frequent.</p>
+</blockquote>
+<p><strong>IMPORTANT:</strong> Since the scheduler only affects review cards, the interval
+modifier setting in the deck options preset in the Anki UI has no effect for
+review cards. Please copy the interval modifier for the deck here.</p>
+<h2 id="calculate-hard-multiplier"><a class="header" href="#calculate-hard-multiplier">Calculate hard multiplier</a></h2>
+<p>A function that takes in two parameters, <code>currentEaseFactor</code> and
+<code>currentInterval</code>, and outputs the resulting ease factor for the Hard button.</p>
+<p>Set to <code>return 0.0;</code> to fallback to Anki's native scheduler, either SM-2 or
+FSRS. This effectively disables the custom scheduler when pressing the Hard
+button.</p>
+<h2 id="calculate-good-multiplier"><a class="header" href="#calculate-good-multiplier">Calculate good multiplier</a></h2>
+<p>A function that takes in two parameters, <code>currentEaseFactor</code> and
+<code>currentInterval</code>, and outputs the resulting ease factor for the Good button.</p>
+<p>Set to <code>return 0.0;</code> to fallback to Anki's native scheduler, either SM-2 or
+FSRS. This effectively disables the custom scheduler when pressing the Good
+button.</p>
+<h2 id="calculate-easy-multiplier"><a class="header" href="#calculate-easy-multiplier">Calculate easy multiplier</a></h2>
+<p>A function that takes in two parameters, <code>currentEaseFactor</code> and
+<code>currentInterval</code>, and outputs the resulting ease factor for the Easy button.</p>
+<p>Set to <code>return 0.0;</code> to fallback to Anki's native scheduler, either SM-2 or
+FSRS. This effectively disables the custom scheduler when pressing the Easy
+button.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="converting-fsrs-to-sm-2-parameters"><a class="header" href="#converting-fsrs-to-sm-2-parameters">Converting FSRS to SM-2 parameters</a></h1>
+<p>Enhancing the Anki SM-2 algorithm by converting the ease factor from a scalar
+value to a mathematical function that takes two parameters, the current ease
+factor and current interval of the card, allows us to approximate FSRS's
+stability increase function with a simple power function.</p>
+<p>According to the <a href="https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c">FSRS
+algorithm</a>,
+the new stability after successful review is calculated as
+\[
+S^\prime_r(D,S,R,G) = S \cdot (e^{w_8} \cdot (11-D) \cdot S^{-w_9} \cdot (e^{w_{10}\cdot(1-R)}-1) \cdot w_{15}(\textrm{if G = 2}) \cdot w_{16}(\textrm{if G = 4}) + 1)
+\]</p>
+<p>and since</p>
+<blockquote>
+<p>Let \(SInc\) (the increase in stability) denotes \(\frac{S^{'}_{r}(D, S,
+R, G)}{S}\) which is equivalent to Anki's ease factor.</p>
+</blockquote>
+<p>we can approximate \(SInc\) with the function \(k \cdot x^a + b\) where
+\(k\) is the current ease factor which has the initial value provided by
+<a href="https://docs.ankiweb.net/deck-options.html#starting-ease">Starting Ease</a>,
+\(x\) is the current interval, and \(a\) and \(b\) is some constant that
+provides the curve of best fit to the \(SInc\) function.</p>
+<p>That is,</p>
+<p>\[
+\text{EaseFactor} = k \cdot x^a + b
+\]</p>
+<p>in the Anki SM-2 next interval function</p>
+<p>\[
+\text{NewInterval} = \text{OldInterval} \times \text{EaseFactor} \times
+\text{IntervalModifier}
+\]</p>
+<h2 id="retrieving-optimized-fsrs-parameters"><a class="header" href="#retrieving-optimized-fsrs-parameters">Retrieving optimized FSRS parameters</a></h2>
+<p><strong>IMPORTANT</strong>: If you do not have many reviews for the optimizer to train on, or
+you have previously used Anki incorrectly, such as pressing the Hard button
+instead of the Again button to fail a card, it is recommended to use the default
+FSRS-6 parameters until your review history is large enough for optimization.</p>
+<p>First, retrieve your optimized FSRS parameters. This can be done either by</p>
+<ol>
+<li>Directly in Anki</li>
+<li>FSRS Optimizer Jupyter Notebook</li>
+</ol>
+<h3 id="anki"><a class="header" href="#anki">Anki</a></h3>
+<p>FSRS can safely be temporarily enabled in the deck options preset by</p>
+<ol>
+<li>Click on the <strong>Gear icon</strong> next to your deck.</li>
+<li>Click on the <strong>Options</strong> button.</li>
+<li>Navigate down to the <strong>FSRS</strong> section and click on the <strong>toggle button</strong> to
+enable FSRS.</li>
+<li>Leave <strong>Desired retention</strong> to the default value. Changing this has no effect on
+the final parameters.</li>
+<li>Copy and save the <strong>FSRS parameters</strong> somewhere for later.</li>
+<li>(Optional) Click on the <strong>Compute minimum recommended retention</strong> label and
+click the <strong>Compute</strong> button. Copy and save the <strong>Minimum recommended
+retention</strong> value somewhere for later.</li>
+<li>Close the deck options preset window and click on <strong>Discard</strong> to discard
+changes.</li>
+</ol>
+<h3 id="fsrs-optimizer-jupyter-notebook"><a class="header" href="#fsrs-optimizer-jupyter-notebook">FSRS Optimizer Jupyter Notebook</a></h3>
+<p>Alternatively, if you don't want to temporarily enable FSRS, the FSRS Optimizer
+Jupyter Notebook can be used instead which provides extra statistics and graphs
+about your review history.</p>
+<ol>
+<li>Go to the <a href="https://github.com/open-spaced-repetition/fsrs4anki/blob/main/fsrs4anki_optimizer.ipynb">FSRS4Anki
+Optimizer</a>.</li>
+<li>Click on the <strong>Open in Colab</strong> button.</li>
+<li>Follow the instructions provided in the notebook.</li>
+<li>Scroll down to the <strong>Result</strong> section</li>
+<li>Copy and save the <strong>optimized FSRS parameters</strong> somewhere for later.</li>
+<li>(Optional) Scroll down to the <strong>Optimize retention to minimize the time of
+reviwes</strong> section, copy and save the <strong>suggested retention</strong> value somewhere
+for later.</li>
+</ol>
+<h2 id="convert-fsrs-to-sm-2"><a class="header" href="#convert-fsrs-to-sm-2">Convert FSRS to SM-2</a></h2>
+<p>To convert your optimized FSRS parameters to SM-2</p>
+<ol>
+<li>Go to the <a href="https://github.com/kuroahna/anki_srs_kai/blob/main/fsrs_to_sm2.ipynb">FSRS to SM-2
+notebook</a>.</li>
+<li>Click on the <strong>Open in Colab</strong> button.</li>
+<li>Replace <code>parameters</code> with your optimized FSRS parameter values.</li>
+<li>Replace <code>starting_ease</code> with the same <a href="https://docs.ankiweb.net/deck-options.html#starting-ease">Starting
+Ease</a> value in your
+deck options preset.</li>
+<li>Replace <code>desired_retention</code> with your desired retention. Optionally, you can
+use the <strong>Minimum recommended retention</strong> value from above.</li>
+<li>Click on the <strong>Runtime</strong> button in the toolbar at the top.</li>
+<li>Click on the <strong>Run all</strong> button.</li>
+<li>Scroll down to for the suggested values.</li>
+</ol>
+<p>For example, with the FSRS-5 default parameters and default Anki SM-2 settings,</p>
+<pre><code class="language-python">parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
+starting_ease = 2.5
+desired_retention = 0.90
+</code></pre>
+<p>The output is</p>
+<pre><code>Replace your settings in the Deck Options for your deck with the values below.
+Note:
+1. Use `Graduating interval (good)` if you often press Good when first learning
+   a new card
+2. Otherwise, use `Graduating interval (hard)` if you often press Hard when
+   first learning a new card
+3. Otherwise, use `Graduating interval (again)` if you often press Again when
+   first learning a new card
+4. If you're not sure, use `Graduating interval (good)`
+This is because FSRS considers the first rating for New cards when training its
+parameters. Since Anki SM-2 does not consider the first rating for New cards, it
+is best to set the Graduating interval to the one you most often use
+
+
+Graduating interval (again): 0
+Graduating interval (hard): 1
+Graduating interval (good): 2
+Easy interval: 8
+
+
+Replace the scheduler settings for your deck in the Custom scheduling field in
+the Deck Options with the following values:
+
+
+scheduler: {
+    // ... (other settings)
+    intervalModifier: 1.0,
+    calculateHardMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.077098162) + (0.144440985);
+    },
+    calculateGoodMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.182458510) + (1.779479164);
+    },
+    calculateEasyMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+        return currentEaseFactor * Math.pow(currentInterval, -0.183552566) + (3.407921198);
+    },
+},
+</code></pre>
+<p>Follow the instructions in the Jupyter notebook output as shown above.</p>
+<ol>
+<li>Click on the <strong>Gear icon</strong> next to your deck.</li>
+<li>Click on the <strong>Options</strong> button.</li>
+<li>Set the <a href="https://docs.ankiweb.net/deck-options.html#graduating-interval">Graduating
+interval</a> to
+one of the suggested values depending on your review habits. If you are not
+sure, use the <strong>Graduating interval (good)</strong> value.</li>
+<li>(Optional) Set the <a href="https://docs.ankiweb.net/deck-options.html#minimum-interval">Minimum
+interval</a> to one
+of the suggested graduating interval values depending on your review habits.
+If you are not sure, use the <strong>Graduating interval (good)</strong> value.</li>
+<li>Set the <a href="https://docs.ankiweb.net/deck-options.html#easy-interval">Easy
+interval</a> to the
+suggested value.</li>
+<li>Scroll down to <strong>Advanced</strong> section, click on <strong>Custom scheduling</strong>, and
+replace the <code>scheduler</code> section in the associated deck in <code>deckOptions</code></li>
+<li>Click on <strong>Save</strong>.</li>
+</ol>
+<h2 id="fine-tuning-the-parameters"><a class="header" href="#fine-tuning-the-parameters">Fine tuning the parameters</a></h2>
+<p>Assuming the Good button is pressed for each review, we can
+<a href="https://www.desmos.com/calculator/comgwaxi4y">graph</a> the functions \(SInc\)
+and <code>calculateGoodMultiplier</code> (similar graphs can be created for the Hard and
+Easy buttons).</p>
+<p><img src="guide/../images/fsrsToSM2GoodButton.png" alt="FSRS to SM2 Good Button" /></p>
+<p>As shown in the graph above, as the interval of a card increases, the smaller
+the ease factor (ie, the increase in interval) which solves the long intervals
+for mature cards issue with SM-2. If the ease factor function grows too fast or
+too slow, you can modify the parameters accordingly.</p>
+<h2 id="reschedule-all-cards-immediately"><a class="header" href="#reschedule-all-cards-immediately">Reschedule all cards immediately</a></h2>
+<p>FSRS has the option to <a href="https://docs.ankiweb.net/deck-options.html#reschedule-cards-on-change">reschedule cards on
+change</a>
+which will reschedule <strong>all</strong> cards with new intervals immediately instead of
+being rescheduled as it comes up during reviews. While this can be temporarily
+used as part of the conversion from FSRS to SM-2, it is <strong>not recommended</strong>
+since it often results in a large number of cards becoming due. Instead, it is
+recommended to allow cards reschedule with the custom scheduler as it comes up
+during reviews. This means that it will <strong>take a few weeks or months before any
+visible results can be observed with the new scheduler</strong>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="examples"><a class="header" href="#examples">Examples</a></h1>
+<h2 id="replace-straight-reward-add-on-and-use-the-native-anki-scheduler"><a class="header" href="#replace-straight-reward-add-on-and-use-the-native-anki-scheduler">Replace Straight Reward add-on and use the native Anki scheduler</a></h2>
+<pre><code class="language-javascript">const deckOptions = {
+    "My Deck": {
+        easeReward: {
+            minimumConsecutiveSuccessfulReviewsRequiredForReward: 3,
+            baseEaseReward: 0.05,
+            stepEaseReward: 0.05,
+            minimumEase: 1.30,
+            maximumEase: 2.50,
+        },
+        scheduler: {
+            // These options are effectively ignored since the hard, good, and
+            // easy buttons are using the native Anki scheduler
+            enableFuzz: true,
+            maximumInterval: 36500,
+            intervalModifier: 1.00,
+            calculateHardMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                // Use the native Anki scheduler for the Hard button
+                return 0.0;
+            },
+            calculateGoodMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                // Use the native Anki scheduler for the Good button
+                return 0.0;
+            },
+            calculateEasyMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                // Use the native Anki scheduler for the Easy button
+                return 0.0;
+            },
+        },
+    },
+};
+</code></pre>
+<h2 id="disable-fuzz-for-anki-sm-2"><a class="header" href="#disable-fuzz-for-anki-sm-2">Disable fuzz for Anki SM-2</a></h2>
+<pre><code class="language-javascript">const deckOptions = {
+    "My Deck": {
+        easeReward: {
+            // Disable ease reward
+            minimumConsecutiveSuccessfulReviewsRequiredForReward: 0,
+            baseEaseReward: 0.05,
+            stepEaseReward: 0.05,
+            minimumEase: 1.30,
+            maximumEase: 2.50,
+        },
+        scheduler: {
+            // Disable fuzz
+            enableFuzz: false,
+            maximumInterval: 36500,
+            intervalModifier: 1.00,
+            calculateHardMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return currentEaseFactor;
+            },
+            calculateGoodMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                // Schedule using the SM-2 algorithm with fuzz disabled
+                //
+                // We cannot return 0.0 since the custom scheduler needs to run
+                // in order to disable fuzz
+                return currentEaseFactor;
+            },
+            calculateEasyMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return currentEaseFactor;
+            },
+        },
+    },
+};
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="faq"><a class="header" href="#faq">FAQ</a></h1>
+<h2 id="what-platforms-and-versions-of-anki-are-supported"><a class="header" href="#what-platforms-and-versions-of-anki-are-supported">What platforms and versions of Anki are supported?</a></h2>
+<p>Anki SRS Kai is supported on the following platforms</p>
+<ul>
+<li>Anki Desktop (Windows, Mac, Linux): 25.07+</li>
+<li>AnkiDroid (Android): 2.22.3+</li>
+<li>AnkiMobile (iOS): 25.07+</li>
+</ul>
+<p><strong>IMPORTANT:</strong> AnkiWeb is <strong>not</strong> supported. There is no technical limitation
+as <a href="https://caniuse.com/wasm">WebAssembly is supported</a> by every major browser.
+However, <a href="https://faqs.ankiweb.net/the-2021-scheduler.html#add-ons-and-custom-scheduling">support for the custom scheduler must be enabled by Anki
+Web</a>
+itself for the custom scheduler to work.</p>
+<blockquote>
+<p>Because this is implemented in JavaScript, it is not limited to the computer
+version. AnkiMobile and AnkiDroid both support it as well, and <strong>AnkiWeb may
+also support it in the future</strong>. This will allow advanced users to make
+adjustments to the standard scheduling behaviour, that apply on all platforms.</p>
+</blockquote>
+<h2 id="can-i-enable-fsrs-and-anki-srs-kai-at-the-same-time"><a class="header" href="#can-i-enable-fsrs-and-anki-srs-kai-at-the-same-time">Can I enable FSRS and Anki SRS Kai at the same time?</a></h2>
+<p>While the custom scheduler (Anki SRS Kai) will continue to work even if FSRS is
+enabled, it is <strong>highly recommended</strong> to turn FSRS off to avoid any potential
+unexpected behaviours not covered in our integration test suite.</p>
+<h2 id="what-is-the-large-binary-blob-called-wasmbytes-in-the-customer-scheduler-and-is-it-safe"><a class="header" href="#what-is-the-large-binary-blob-called-wasmbytes-in-the-customer-scheduler-and-is-it-safe">What is the large binary blob called <code>wasmBytes</code> in the customer scheduler and is it safe?</a></h2>
+<p>The large binary blob called <code>wasmBytes</code> in the custom scheduler is the code
+that runs the Anki SRS Kai scheduler. It is compiled from Rust to
+<a href="https://webassembly.org/">WebAssembly</a> and is
+<a href="https://webassembly.org/docs/security/">safe</a> by design. Each WebAssembly
+module is ran in a memory-safe, sandboxed environment, separated from the host
+runtime. The source code is <a href="https://github.com/kuroahna/anki_srs_kai">publicly
+available</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="recommendations"><a class="header" href="#recommendations">Recommendations</a></h1>
+<p>Below is general advice to potentially help increase retention rate and reduce
+overall workload, but is by no means hard, set in stone rules, and may not be
+applicable to all contexts.</p>
+<h2 id="auto-suspend-leeches"><a class="header" href="#auto-suspend-leeches">Auto suspend leeches</a></h2>
+<p>It is <strong>highly recommended</strong> to auto suspend
+<a href="https://docs.ankiweb.net/leeches.html">leeches</a>.</p>
+<p>While Ease Reward or FSRS' mean reversion algorithm can help address Ease Hell,
+it only solves half of the problem. Suppose you have a difficult card that you
+keep failing. In this case, Ease Reward or the FSRS mean reversion algorithm
+will never be applied, and hence, the card will be stuck in Ease Hell.</p>
+<p>Assuming the starting ease for a card is 250%. If we set the leech threshold
+to 4, then pressing the Again button 4 times at any point in its review history
+will automatically suspend the card. This means the lowest ease a card can have
+is \(250\% - (4 - 1) \cdot 20\% = 190\%\). Likewise, if the leech
+threshold is 8, then the lowest ease a card can have is \(250\% - (8 - 1)
+\cdot 20\% = 110\%\), but since the minimum ease factor in Anki is 130%, it
+is capped at 130%.</p>
+<p>Once a card has leeched, it is <strong>highly recommended</strong> to deal with the leech. As
+mentioned in the Anki docs, there are 3 ways to deal with a leech.</p>
+<ol>
+<li><a href="https://docs.ankiweb.net/leeches.html#editing">Editing</a></li>
+<li><a href="https://docs.ankiweb.net/leeches.html#deleting">Deleting</a></li>
+<li><a href="https://docs.ankiweb.net/leeches.html#waiting">Waiting</a></li>
+</ol>
+<p>The best option is to edit the card to make it less difficult. This includes
+sticking to the <a href="https://super-memory.com/articles/20rules.htm">minimum information
+principle</a> and refactoring the
+card, or adding hints to the front of the card such as example sentences or
+hints on how to read a word (such as 訓読み, 音読み, 当て字, 湯桶読み, or
+重箱読み for Japanese). Also, it is beneficial to spend more time to understand
+the material better, looking up a word's etymology, extra example sentences,
+paying close attention to how the character is written (such as how the kanji
+character is written in Japanese), creating mnemonics, etc.</p>
+<p>Once the card has been refactored, it is <strong>highly recommended</strong> to <strong>Reset</strong> the
+card in the <strong>Card Browser</strong> with the <strong>Reset repetition and lapse counts</strong>
+checkbox enabled and treat it as a new card. If the lapse counts are not reset,
+then Anki will automatically suspend the card again in <strong>half</strong> the threshold.
+For example, if the threshold is set to 4, and the card is not reset, then it
+will be suspended again at the 6th lapse instead of the 8th lapse.</p>
+<p>To enable this feature,</p>
+<ol>
+<li>Click on the <strong>Gear icon</strong> button for your deck.</li>
+<li>Click on the <strong>Options</strong> button.</li>
+<li>Scroll down to the <strong>Lapses</strong> section.</li>
+<li>Set <strong>Leech threshold</strong> to a value between 4 to 8.</li>
+<li>Set <strong>Leech action</strong> to <strong>Suspend Card</strong>.</li>
+<li>Click on the <strong>Save</strong> button.</li>
+</ol>
+<h2 id="set-post-lapse-interval-to-0"><a class="header" href="#set-post-lapse-interval-to-0">Set post-lapse interval to 0</a></h2>
+<p>While preserving a card's interval might make sense since the material has not
+been completely forgotten, SuperMemo has found that it is
+<a href="https://supermemo.guru/wiki/Post-lapse_stability">harmful</a>, since it slows down
+the identification of leeches. They state</p>
+<blockquote>
+<p>Post-lapse stability (PLS) is the stability after a review with a failing
+grade. Unlike stability computed after a successful repetition, post-lapse
+stability cannot be derived from the SInc matrix.</p>
+<p>In the ideal case, for simple memories, forgetting results in a reset of
+estimated stability back to near-zero. In theory, only difficult items made of
+composite memories may show a substantial decrease in the costs of
+re-learning, however, even that does not show in data.</p>
+<p>It has been shown long ago that the length of the first post-lapse optimum
+interval is best correlated with the number of memory lapses recorded for the
+item. Even then, <strong>post-lapse interval usually oscillates in the range of 1-4
+days for the default forgetting index of 10%</strong>. The correlation between lapses
+and the PLS is not very useful in adding to the efficiency of learning. Some
+competitive spaced repetition software, as well as SuperMemo in its first
+years, experimented with re-learning hypotheses based on ancient wisdoms of
+psychology, e.g. by halving intervals after a memory lapse. <strong>Current data
+shows clearly that this approach is harmful, as it slows down the
+identification of leeches.</strong> Such an approach to handling forgotten items is a
+form of irrational procrastination.</p>
+</blockquote>
+<p>By aggressively dealing with difficult cards and allowing them to leech, your
+retention should stay fairly high (around 90%) since a majority of your cards
+are made less difficult. This also allows the FSRS optimizer to provide better
+optimized parameters that reduce your overall workload.</p>
+<p>Completely resetting a card's interval to 0 after a lapse is not harmful either.
+If the card is truly easy, then the card can be passed within a very short
+amount of time and does not contribute much to the actual overall workload.
+Otherwise, if it is difficult to recall, then it needed the extra repetitions in
+order for it to consolidate in your long term memory.</p>
+<p>To enable this feature,</p>
+<ol>
+<li>Click on the <strong>Gear icon</strong> button for your deck.</li>
+<li>Click on the <strong>Options</strong> button.</li>
+<li>Scroll down to the <strong>Advanced</strong> section.</li>
+<li>Set <strong>New Interval</strong> to <code>0.00</code>.</li>
+<li>Click on the <strong>Save</strong> button.</li>
+</ol>
+<h2 id="avoid-spending-too-much-time-on-a-single-card"><a class="header" href="#avoid-spending-too-much-time-on-a-single-card">Avoid spending too much time on a single card</a></h2>
+<p>As the <a href="https://docs.ankiweb.net/studying.html#questions">Anki docs</a> states,</p>
+<blockquote>
+<p>When a card is shown, only the question is shown at first. After thinking
+about the answer, either click the Show Answer button, or press the spacebar.
+The answer will then be shown. It’s okay if it takes you a little while to
+recall the answer, but as a general rule <strong>if you can’t answer within about 10
+seconds, it’s probably better to move on and show the answer than keep
+struggling to remember.</strong></p>
+</blockquote>
+<p>It is generally better to spend as little time as possible per card. If you
+stick to the minimum information principle, the cards should naturally be simple
+and easy to remember. In this case, if the card still takes awhile to remember,
+then it indicates that the material is not yet well understood and needs the
+extra repetitions, so it is best to quickly fail rather than spend a long time
+trying to recall the information.</p>
+<p>For example, in language learning contexts such as Japanese, vocabulary cards
+can be reviewed within 2 to 3 seconds each. If it takes longer than that, it is
+a good indication that the word has not yet been well learned and should be
+reviewed more frequently by failing the card and trying again. A benefit of
+spending less time per card is that the overall time to review a deck decreases.
+Also, unintuitively, failing cards quickly has the extra benefit of <em>increasing</em>
+your retention since it forces you to know the material well.</p>
+<h2 id="only-use-again-and-good-buttons"><a class="header" href="#only-use-again-and-good-buttons">Only use Again and Good buttons</a></h2>
+<p>It may be beneficial to limit yourself and only use the Again (Fail) and Good
+(Pass) buttons. The main benefit is to reduce the mental fatigue of choosing
+whether a card was hard, good, or easy and limiting the number of choices from 4
+to 2.</p>
+<p>There is no conclusive evidence that this is objectively better, but FSRS has
+done some
+<a href="https://www.reddit.com/r/Anki/comments/1d0fmsz/fsrs_is_more_accurate_if_you_only_use_again_and/">research</a>
+and found using only the Again and Good buttons was more accurate. However, they
+have noted that it is inconclusive and they do not endorse the advice anymore.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="personal-results"><a class="header" href="#personal-results">Personal Results</a></h1>
+<p>After a year of testing on my Japanese deck from December 2023 with ~30,000 cards
+learned to December 2024 with ~37,000 cards learned, using Anki SRS Kai over
+Anki SM-2 has increased my monthly mature (cards with an interval greater than
+or equal to 21) retention rate from 80.7% to 88%, monthly supermature (cards
+with an interval greater than or equal to 100) retention from 81.8% to 88.6%,
+and <strong>reduced my daily workload by almost 17%</strong>, from ~350 cards to review to
+~300 cards to review each day.</p>
+<p>Optimizing my deck with FSRS 4.5 produced the following parameters</p>
+<pre><code>w = [3.0764, 4.0925, 6.2791, 10.5132, 5.0603, 0.8525, 0.7931, 0.0993, 0.8338,
+0.1, 0.9419, 2.0364, 0.1718, 0.4441, 1.3824, 0.0001, 3.9998]
+</code></pre>
+<p>which have later been converted to SM-2 parameters in the custom scheduler code
+below.</p>
+<h2 id="previous-anki-settings"><a class="header" href="#previous-anki-settings">Previous Anki Settings</a></h2>
+<p>Daily Limits</p>
+<ul>
+<li>New cards/day: 20</li>
+<li>Maximum reviews/day: 9999</li>
+<li>New cards ignore review limit: off</li>
+<li>Limits start from top: off</li>
+</ul>
+<p>New Cards</p>
+<ul>
+<li>Learning steps: 1m 10m 1h</li>
+<li>Graduating interval: 1</li>
+<li>Easy interval: 4</li>
+<li>Insertion order: Sequential (oldest cards first)</li>
+</ul>
+<p>Lapses</p>
+<ul>
+<li>Relearning steps: 10m 1h</li>
+<li>Minimum interval: 1</li>
+<li>Leech threshold: 4</li>
+<li>Leech action: Suspend Card</li>
+</ul>
+<p>Display Order</p>
+<ul>
+<li>New card gather order: Descending position</li>
+<li>New card sort order: Card type, then order gathered</li>
+<li>New/review order: Show before reviews</li>
+<li>Interday learning/review order: Mix with reviews</li>
+<li>Review sort order: Due date, then random</li>
+</ul>
+<p>FSRS</p>
+<ul>
+<li>FSRS: off</li>
+</ul>
+<p>Burying</p>
+<ul>
+<li>Bury new siblings: off</li>
+<li>Bury review siblings: off</li>
+<li>Bury interday learning siblings: off</li>
+</ul>
+<p>Advanced</p>
+<ul>
+<li>Maximum interval: 1825</li>
+<li>Starting ease: 2.50</li>
+<li>Easy bonus: 1.30</li>
+<li>Interval modifier: 1.00</li>
+<li>Hard interval: 1.20</li>
+<li>New interval: 0.00</li>
+<li>Custom scheduling: empty</li>
+</ul>
+<h2 id="new-anki-settings"><a class="header" href="#new-anki-settings">New Anki Settings</a></h2>
+<p>Daily Limits</p>
+<ul>
+<li>New cards/day: 20</li>
+<li>Maximum reviews/day: 9999</li>
+<li>New cards ignore review limit: off</li>
+<li>Limits start from top: off</li>
+</ul>
+<p>New Cards</p>
+<ul>
+<li>Learning steps: 1m 10m 1h</li>
+<li><strong>Graduating interval: 4</strong></li>
+<li>Easy interval: 4</li>
+<li>Insertion order: Sequential (oldest cards first)</li>
+</ul>
+<p>Lapses</p>
+<ul>
+<li>Relearning steps: 10m 1h</li>
+<li><strong>Minimum interval: 3</strong></li>
+<li>Leech threshold: 4</li>
+<li>Leech action: Suspend Card</li>
+</ul>
+<p>Display Order</p>
+<ul>
+<li>New card gather order: Descending position</li>
+<li>New card sort order: Card type, then order gathered</li>
+<li>New/review order: Show before reviews</li>
+<li>Interday learning/review order: Mix with reviews</li>
+<li>Review sort order: Due date, then random</li>
+</ul>
+<p>FSRS</p>
+<ul>
+<li>FSRS: off</li>
+</ul>
+<p>Burying</p>
+<ul>
+<li>Bury new siblings: off</li>
+<li>Bury review siblings: off</li>
+<li>Bury interday learning siblings: off</li>
+</ul>
+<p>Advanced</p>
+<ul>
+<li>Maximum interval: 1825</li>
+<li>Starting ease: 2.50</li>
+<li>Easy bonus: 1.30</li>
+<li>Interval modifier: 1.00</li>
+<li>Hard interval: 1.20</li>
+<li>New interval: 0.00</li>
+<li><strong>Custom scheduling</strong>:</li>
+</ul>
+<pre><code class="language-javascript">const deckOptions = {
+    "日本語": {
+        easeReward: {
+            minimumConsecutiveSuccessfulReviewsRequiredForReward: 3,
+            baseEaseReward: 0.05,
+            stepEaseReward: 0.05,
+            minimumEase: 1.30,
+            maximumEase: 2.50,
+        },
+        scheduler: {
+            enableFuzz: true,
+            maximumInterval: 1825,
+            intervalModifier: 1.00,
+            calculateHardMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return 0.0;
+            },
+            calculateGoodMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return currentEaseFactor / Math.pow(currentInterval,
+0.059729712);
+            },
+            calculateEasyMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return 0.0;
+            },
+        },
+    },
+    "Global Settings": {
+        easeReward: {
+            minimumConsecutiveSuccessfulReviewsRequiredForReward: 3,
+            baseEaseReward: 0.05,
+            stepEaseReward: 0.05,
+            minimumEase: 1.30,
+            maximumEase: 2.50,
+        },
+        scheduler: {
+            enableFuzz: true,
+            maximumInterval: 1825,
+            intervalModifier: 1.00,
+            // Approximation of the default FSRS v4 parameters
+            // [0.27, 0.74, 1.3, 5.52, 5.1, 1.02, 0.78, 0.06, 1.57, 0.14, 0.94, 2.16, 0.06, 0.31, 1.34, 0.21, 2.69]
+            calculateHardMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return 0.0;
+            },
+            calculateGoodMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return (currentEaseFactor / Math.pow(currentInterval,
+0.024210328));
+            },
+            calculateEasyMultiplier: (currentEaseFactor, currentInterval) =&gt; {
+                return 0.0;
+            },
+        },
+    },
+};
+
+// Anki SRS Kai code below
+// ...
+</code></pre>
+<h2 id="statistics"><a class="header" href="#statistics">Statistics</a></h2>
+<p>The image below is my retention rate using Anki SM-2.</p>
+<p><img src="guide/../images/personalResultRetentionBefore.png" alt="Anki SM-2 retention rate" /></p>
+<p>The image below is my retention rate using Anki SRS Kai.</p>
+<p><img src="guide/../images/personalResultRetentionAfter.png" alt="Anki SRS Kai retention rate" /></p>
+<p><img src="guide/../images/personalResultStats1.png" alt="Review workload" /></p>
+<p><img src="guide/../images/personalResultStats2.png" alt="Card counts graph" /></p>
+<p><img src="guide/../images/personalResultStats3.png" alt="Card ease graph" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="support-development"><a class="header" href="#support-development">Support development</a></h1>
+<p>Any contributions to Anki SRS Kai is greatly appreciated, whether it is
+reporting bugs, improving documentation, or submitting code enhancements.</p>
+<ul>
+<li><strong>Bug reports</strong>: Found an issue? Report it on our <a href="https://github.com/kuroahna/anki_srs_kai/issues">issue
+tracker</a> page.</li>
+<li><strong>Documentation</strong>: Help us make the documentation more comprehensive and
+beginner friendly.</li>
+<li><strong>Code contributions</strong>: Submit <a href="https://github.com/kuroahna/anki_srs_kai/pulls">pull
+requests</a> to improve existing
+features or add new ones.</li>
+<li><strong>Sponsor development</strong>: You can also sponsor this project via <a href="https://github.com/sponsors/kuroahna">GitHub
+sponsors</a>. Your sponsorship directly
+supports the development and maintenance of Anki SRS Kai.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="changelog"><a class="header" href="#changelog">Changelog</a></h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>,
+and this project adheres to <a href="https://calver.org/">Calendar Versioning</a>.</p>
+<h2 id="unreleased"><a class="header" href="#unreleased">[Unreleased]</a></h2>
+<h2 id="2580---2025-08-16"><a class="header" href="#2580---2025-08-16">[25.8.0] - 2025-08-16</a></h2>
+<h3 id="changed"><a class="header" href="#changed">Changed</a></h3>
+<ul>
+<li>Update scheduler to Anki 25.07.5.</li>
+<li>Update FSRS to SM-2 Jupyter notebook to use FSRS-6.</li>
+<li>Update AnkiDroid integration test suite to use AnkiDroid v2.22.3 with Anki
+backend 25.07.5.</li>
+</ul>
+<h2 id="24120---2024-12-27"><a class="header" href="#24120---2024-12-27">[24.12.0] - 2024-12-27</a></h2>
+<h3 id="added"><a class="header" href="#added">Added</a></h3>
+<ul>
+<li>Anki SRS Kai custom scheduler.</li>
+<li>Anki SRS Kai addon to migrate from the Straight Reward add-on to Ease Reward.</li>
+<li>FSRS-5 to SM-2 Jupyter Notebook.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
