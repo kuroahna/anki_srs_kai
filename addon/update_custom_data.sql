@@ -6,7 +6,7 @@ SET data = json_patch(
     json_object(
         -- Anki stores the customData in the cards table under the data column as a JSON string in
         -- the "cd" field
-        -- https://github.com/ankitects/anki/blob/24.11/rslib/src/storage/card/data.rs#L49
+        -- https://github.com/ankitects/anki/blob/25.07.5/rslib/src/storage/card/data.rs#L60
         'cd',
         -- Remove the single quotes introduced by calling quote
         -- https://www.sqlite.org/lang_corefunc.html#quote
@@ -37,7 +37,7 @@ SET data = json_patch(
                             --               when rescheduling is disabled)
                             -- 4 = Manual
                             -- 5 = Rescheduled
-                            -- https://github.com/ankitects/anki/blob/24.11/rslib/src/revlog/mod.rs#L65-L76
+                            -- https://github.com/ankitects/anki/blob/25.07.5/rslib/src/revlog/mod.rs#L65-L76
                             --
                             -- We only want to find cards that have been reviewed normally.
                             -- Reviewing cards before they're due or when rescheduling is disabled
@@ -47,14 +47,14 @@ SET data = json_patch(
                             -- review: 1 (again), 2 (hard), 3 (good), 4 (easy)
                             -- learn/relearn: 1 (again), 2 (good), 3 (easy)
                             -- 0 represents manual rescheduling
-                            -- https://github.com/ankitects/anki/blob/24.11/rslib/src/revlog/mod.rs#L43
+                            -- https://github.com/ankitects/anki/blob/25.07.5/rslib/src/revlog/mod.rs#L43
                             --
                             -- A successful review is if we have pressed ease=3 (Good) or
                             -- ease=4 (Easy)
                             AND revlog.ease IN (3, 4)
                             -- revlog ids are epoch-milliseconds timestamp of when you did the
                             -- review
-                            -- https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/answering/revlog.rs#L44
+                            -- https://github.com/ankitects/anki/blob/25.07.5/rslib/src/scheduler/answering/revlog.rs#L44
                             --
                             -- We want to find the number of successful reviews after the last time
                             -- ease=1 (Again) was pressed
@@ -94,7 +94,7 @@ SET data = json_patch(
                                     --               disabled)
                                     -- 4 = Manual
                                     -- 5 = Rescheduled
-                                    -- https://github.com/ankitects/anki/blob/24.11/rslib/src/revlog/mod.rs#L65-L76
+                                    -- https://github.com/ankitects/anki/blob/25.07.5/rslib/src/revlog/mod.rs#L65-L76
                                     --
                                     -- We only want to find cards that have been reviewed normally.
                                     -- Reviewing cards before they're due or when rescheduling is
@@ -104,7 +104,7 @@ SET data = json_patch(
                                     -- review: 1 (again), 2 (hard), 3 (good), 4 (easy)
                                     -- learn/relearn: 1 (again), 2 (good), 3 (easy)
                                     -- 0 represents manual rescheduling
-                                    -- https://github.com/ankitects/anki/blob/24.11/rslib/src/revlog/mod.rs#L43
+                                    -- https://github.com/ankitects/anki/blob/25.07.5/rslib/src/revlog/mod.rs#L43
                                     --
                                     -- ease=1 (Again) was pressed
                                     AND revlog.ease = 1
@@ -122,7 +122,7 @@ SET data = json_patch(
 -- 1 = Learn
 -- 2 = Review
 -- 3 = Relearn
--- https://github.com/ankitects/anki/blob/24.11/rslib/src/card/mod.rs#L40
+-- https://github.com/ankitects/anki/blob/25.07.5/rslib/src/card/mod.rs#L40
 --
 -- Only modify review cards because new, learn, and relearn cards have not had a successful review
 -- yet. It'll also avoid adding unnecessary customData to the cards which will take up extra space

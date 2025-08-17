@@ -1,6 +1,7 @@
 package com.ichi2.anki.ankisrskai
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
@@ -19,10 +20,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import anki.cards.FsrsMemoryState
 import com.ichi2.anki.CollectionManager
 import com.ichi2.anki.R
+import com.ichi2.anki.common.time.TimeManager
+import com.ichi2.anki.libanki.Card
+import com.ichi2.anki.libanki.CardType
+import com.ichi2.anki.libanki.QueueType
 import com.ichi2.anki.preferences.sharedPrefs
-import com.ichi2.libanki.Card
-import com.ichi2.libanki.Consts
-import com.ichi2.libanki.utils.TimeManager
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -33,7 +35,7 @@ class AnkiSrsKaiTestUtils private constructor() {
         fun disableAnimations() {
             val context = ApplicationProvider.getApplicationContext<Context>()
             val key = context.getString(R.string.safe_display_key)
-            context.sharedPrefs().edit().putBoolean(key, true).commit()
+            context.sharedPrefs().edit(commit = true) { putBoolean(key, true) }
         }
 
         fun closeGetStartedScreenIfExists() {
@@ -165,16 +167,16 @@ class AnkiSrsKaiTestUtils private constructor() {
         }
 
         fun Card.moveToLearnQueue() {
-            this.queue = Consts.QUEUE_TYPE_LRN
-            this.type = Consts.CARD_TYPE_LRN
+            this.queue = QueueType.Lrn
+            this.type = CardType.Lrn
             this.due = 0
             val col = CollectionManager.getColUnsafe()
             col.updateCard(this, true)
         }
 
         fun Card.moveToRelearnQueue() {
-            this.queue = Consts.QUEUE_TYPE_LRN
-            this.type = Consts.CARD_TYPE_RELEARNING
+            this.queue = QueueType.Lrn
+            this.type = CardType.Relearning
             this.due = 0
             val col = CollectionManager.getColUnsafe()
             col.updateCard(this, true)

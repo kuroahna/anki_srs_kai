@@ -69,7 +69,7 @@
 
             nativeBuildInputs = with pkgs; [
               binaryen
-              wasm-bindgen-cli
+              wasm-bindgen-cli_0_2_100
             ];
 
             CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER = "wasm-bindgen-test-runner";
@@ -108,7 +108,7 @@
           };
         };
 
-        buildToolsVersion = "34.0.0";
+        buildToolsVersion = "35.0.0";
         platformVersion = "35";
         systemImageType = "google_apis";
         abiVersion = "x86_64";
@@ -131,7 +131,7 @@
 
         ankidroid = pkgs.stdenv.mkDerivation (finalAttrs: {
           pname = "AnkiDroid";
-          version = "v2.20.1";
+          version = "v2.22.3";
           strictDeps = true;
 
           ankiDroidSource = pkgs.fetchFromGitHub {
@@ -149,7 +149,7 @@
             #
             # https://nixos.org/manual/nixpkgs/unstable/index.html#chap-pkgs-fetchers-caveats
             # https://nixos.org/manual/nixpkgs/unstable/index.html#sec-pkgs-fetchers-updating-source-hashes
-            hash = "sha256-CPCczLovuQTjUTWgjVjgZ8PL4idlcTzWZ2wKwqsF+cg=";
+            hash = "sha256-ifCnWc1fucOeF9jHdtPTGz/AEOVCXvinB1kQIS3aOk4=";
             name = finalAttrs.pname;
           };
           localDirectory = pkgs.lib.fileset.toSource {

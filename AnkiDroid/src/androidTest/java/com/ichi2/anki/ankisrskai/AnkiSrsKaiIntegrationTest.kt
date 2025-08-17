@@ -33,12 +33,13 @@ import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.readAssetFile
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.rebuildFilteredDeck
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.refreshDeck
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.reviewDeckWithName
+import com.ichi2.anki.common.time.TimeManager
+import com.ichi2.anki.libanki.CardType
+import com.ichi2.anki.libanki.QueueType
 import com.ichi2.anki.tests.InstrumentedTest
 import com.ichi2.anki.testutil.GrantStoragePermission.storagePermission
 import com.ichi2.anki.testutil.grantPermissions
 import com.ichi2.anki.testutil.notificationPermission
-import com.ichi2.libanki.Consts
-import com.ichi2.libanki.utils.TimeManager
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -104,9 +105,9 @@ const deckOptions = {
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
         col.config.set("cardStateCustomizer", deckOptions + scheduler)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
         card.factor = 2000
         card.ivl = 100
@@ -141,8 +142,8 @@ const deckOptions = {
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb)
-            .hasCardType(Consts.CARD_TYPE_RELEARNING)
-            .hasQueueType(Consts.QUEUE_TYPE_LRN)
+            .hasCardType(CardType.Relearning.code)
+            .hasQueueType(QueueType.Lrn.code)
             .hasDue(cardFromDb.toBackendCard().due)
             .hasInterval(1)
             .hasEaseFactor(1850)
@@ -196,9 +197,9 @@ const deckOptions = {
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
         col.config.set("cardStateCustomizer", deckOptions + scheduler)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
         card.factor = 2000
         card.ivl = 100
@@ -297,9 +298,9 @@ const deckOptions = {
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
         col.config.set("cardStateCustomizer", deckOptions + scheduler)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
         card.factor = 2000
         card.ivl = 100
@@ -398,9 +399,9 @@ const deckOptions = {
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
         col.config.set("cardStateCustomizer", deckOptions + scheduler)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
         card.factor = 2000
         card.ivl = 100
@@ -502,22 +503,22 @@ const deckOptions = {
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
         col.config.set("cardStateCustomizer", deckOptions + scheduler)
-        val hardNote = addNoteUsingBasicModel("foo", "hard")
+        val hardNote = addNoteUsingBasicNoteType("foo", "hard")
         val hardCard = hardNote.firstCard(col)
-        val deck = col.decks.get(hardNote.notetype.did)!!
+        val deck = col.decks.getLegacy(hardNote.notetype.did)!!
         hardCard.moveToReviewQueue()
         hardCard.factor = 2000
         hardCard.ivl = 100
         col.updateCard(hardCard, skipUndoEntry = true)
 
-        val goodNote = addNoteUsingBasicModel("foo", "good")
+        val goodNote = addNoteUsingBasicNoteType("foo", "good")
         val goodCard = goodNote.firstCard(col)
         goodCard.moveToReviewQueue()
         goodCard.factor = 2000
         goodCard.ivl = 100
         col.updateCard(goodCard, skipUndoEntry = true)
 
-        val easyNote = addNoteUsingBasicModel("foo", "easy")
+        val easyNote = addNoteUsingBasicNoteType("foo", "easy")
         val easyCard = easyNote.firstCard(col)
         easyCard.moveToReviewQueue()
         easyCard.factor = 2000
@@ -610,9 +611,9 @@ const deckOptions = {
 };
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         val deckConfig = col.backend.getDeckConfig(deck.id)
         col.backend.updateDeckConfigs(
             deck.id,
@@ -632,7 +633,8 @@ const deckOptions = {
                 .setReviewTodayActive(true)
                 .build(),
             applyAllParentLimits = true,
-            fsrsReschedule = false
+            fsrsReschedule = false,
+            fsrsHealthCheck = false
         )
         card.moveToReviewQueue()
         card.factor = 2000
@@ -691,12 +693,12 @@ const deckOptions = {
             //
             // Any time the default FSRS weights are updated, these values will change
             //
-            // https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/answering/mod.rs#L433
+            // https://github.com/ankitects/anki/blob/25.07.5/rslib/src/scheduler/answering/mod.rs#L448
             .hasMemoryState(
                 FsrsMemoryState
                     .newBuilder()
-                    .setDifficulty(4.992F)
-                    .setStability(140.777F)
+                    .setDifficulty(4.99F)
+                    .setStability(100.0F)
                     .build()
             )
             .hasDesiredRetention(0.90F)
@@ -733,22 +735,22 @@ const deckOptions = {
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
         col.config.set("cardStateCustomizer", deckOptions + scheduler)
-        val hardNote = addNoteUsingBasicModel("foo", "hard")
+        val hardNote = addNoteUsingBasicNoteType("foo", "hard")
         val hardCard = hardNote.firstCard(col)
-        val deck = col.decks.get(hardNote.notetype.did)!!
+        val deck = col.decks.getLegacy(hardNote.notetype.did)!!
         hardCard.moveToReviewQueue()
         hardCard.factor = 2000
         hardCard.ivl = 100
         col.updateCard(hardCard, skipUndoEntry = true)
 
-        val goodNote = addNoteUsingBasicModel("foo", "good")
+        val goodNote = addNoteUsingBasicNoteType("foo", "good")
         val goodCard = goodNote.firstCard(col)
         goodCard.moveToReviewQueue()
         goodCard.factor = 2000
         goodCard.ivl = 100
         col.updateCard(goodCard, skipUndoEntry = true)
 
-        val easyNote = addNoteUsingBasicModel("foo", "easy")
+        val easyNote = addNoteUsingBasicNoteType("foo", "easy")
         val easyCard = easyNote.firstCard(col)
         easyCard.moveToReviewQueue()
         easyCard.factor = 2000
@@ -851,9 +853,9 @@ const deckOptions = {
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
         col.config.set("cardStateCustomizer", deckOptions + scheduler)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
         card.factor = 2000
         card.ivl = 100
@@ -941,9 +943,9 @@ const deckOptions = {
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
         col.config.set("cardStateCustomizer", deckOptions + scheduler)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
         card.factor = 2000
         card.ivl = 100
@@ -1026,21 +1028,21 @@ const deckOptions = {
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
         col.config.set("cardStateCustomizer", deckOptions + scheduler)
-        val hardNote = addNoteUsingBasicModel("foo", "hard")
+        val hardNote = addNoteUsingBasicNoteType("foo", "hard")
         val hardCard = hardNote.firstCard(col)
         hardCard.moveToReviewQueue()
         hardCard.factor = 2000
         hardCard.ivl = 100
         col.updateCard(hardCard, skipUndoEntry = true)
 
-        val goodNote = addNoteUsingBasicModel("foo", "good")
+        val goodNote = addNoteUsingBasicNoteType("foo", "good")
         val goodCard = goodNote.firstCard(col)
         goodCard.moveToReviewQueue()
         goodCard.factor = 2000
         goodCard.ivl = 100
         col.updateCard(goodCard, skipUndoEntry = true)
 
-        val easyNote = addNoteUsingBasicModel("foo", "easy")
+        val easyNote = addNoteUsingBasicNoteType("foo", "easy")
         val easyCard = easyNote.firstCard(col)
         easyCard.moveToReviewQueue()
         easyCard.factor = 2000
@@ -1177,7 +1179,7 @@ const deckOptions = {
         """
         val scheduler = readAssetFile(SCHEDULER_FILE_NAME)
         col.config.set("cardStateCustomizer", deckOptions + scheduler)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
         card.moveToReviewQueue()
         card.factor = 2000
@@ -1235,8 +1237,8 @@ const deckOptions = {
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb)
-            .hasCardType(Consts.CARD_TYPE_RELEARNING)
-            .hasQueueType(Consts.QUEUE_TYPE_LRN)
+            .hasCardType(CardType.Relearning.code)
+            .hasQueueType(QueueType.Lrn.code)
             .hasDue(cardFromDb.toBackendCard().due)
             .hasInterval(1)
             .hasEaseFactor(1850)

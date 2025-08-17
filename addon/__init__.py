@@ -5,8 +5,8 @@ from aqt.qt import QAction
 
 
 anki_version = tuple(int(segment) for segment in aqt.appVersion.split("."))
-if anki_version < (23, 10, 1):
-    raise Exception("Minimum supported Anki version is 23.10.1")
+if anki_version < (25, 07, 5):
+    raise Exception("Minimum supported Anki version is 25.07.5")
 
 
 def update_cards():

@@ -96,7 +96,7 @@ impl Scheduler {
 // precision when we cross the Rust and JavaScript boundary since all numbers
 // are f64 in JavaScript
 //
-// See: https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/states/review.rs
+// See: https://github.com/ankitects/anki/blob/25.07.5/rslib/src/scheduler/states/review.rs
 
 struct InternalScheduler {
     fuzz_factor: Option<f64>,
@@ -187,7 +187,7 @@ impl InternalScheduler {
     }
 
     fn passing_nonearly_review_intervals(&self) -> (u32, u32, u32) {
-        let current_interval = self.scheduled_days as f64;
+        let current_interval = (self.scheduled_days as f64).max(1.0);
         let days_late = self.days_late().max(0) as f64;
 
         // hard
@@ -244,7 +244,7 @@ impl InternalScheduler {
         }
     }
 
-    // See: https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/states/mod.rs#L121
+    // See: https://github.com/ankitects/anki/blob/25.07.5/rslib/src/scheduler/states/mod.rs#L121
     /// Return the minimum and maximum review intervals.
     /// - `maximum` is `self.maximum_review_interval`, but at least 1.
     /// - `minimum` is as passed, but at least 1, and at most `maximum`.
@@ -254,17 +254,19 @@ impl InternalScheduler {
         (minimum, maximum)
     }
 
-    // See: https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/states/fuzz.rs#L36
+    // See: https://github.com/ankitects/anki/blob/25.07.5/rslib/src/scheduler/states/fuzz.rs#L36
     fn with_review_fuzz(&self, interval: f64, minimum: u32, maximum: u32) -> u32 {
-        // self.load_balancer
+        // self.load_balancer_ctx
         //     .as_ref()
-        //     .and_then(|load_balancer| load_balancer.find_interval(interval, minimum, maximum))
-        //     .unwrap_or_else(|| with_review_fuzz(self.fuzz_factor, interval, minimum, maximum));
+        //     .and_then(|load_balancer_ctx| {
+        //         load_balancer_ctx.find_interval(interval, minimum, maximum)
+        //     })
+        //     .unwrap_or_else(|| with_review_fuzz(self.fuzz_factor, interval, minimum, maximum))
         with_review_fuzz(self.fuzz_factor, interval, minimum, maximum)
     }
 }
 
-// See: https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/states/fuzz.rs#L63
+// See: https://github.com/ankitects/anki/blob/25.07.5/rslib/src/scheduler/states/fuzz.rs#L65
 fn with_review_fuzz(fuzz_factor: Option<f64>, interval: f64, minimum: u32, maximum: u32) -> u32 {
     if let Some(fuzz_factor) = fuzz_factor {
         let (lower, upper) = constrained_fuzz_bounds(interval, minimum, maximum);
@@ -342,11 +344,11 @@ static FUZZ_RANGES: [FuzzRange; 3] = [
     },
 ];
 
-// See: https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/answering/mod.rs#L618
+// See: https://github.com/ankitects/anki/blob/25.07.5/rslib/src/scheduler/answering/mod.rs#L650
 /// Return a fuzz factor from the range `0.0..1.0`, using the provided seed.
 /// None if seed is None.
 fn get_fuzz_factor(seed: Option<u64>) -> Option<f64> {
-    seed.map(|s| StdRng::seed_from_u64(s).gen_range(0.0..1.0))
+    seed.map(|s| StdRng::seed_from_u64(s).random_range(0.0..1.0))
 }
 
 #[cfg(test)]

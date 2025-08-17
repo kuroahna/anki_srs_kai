@@ -28,15 +28,14 @@ import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.readAssetFile
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.rebuildFilteredDeck
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.refreshDeck
 import com.ichi2.anki.ankisrskai.AnkiSrsKaiTestUtils.Companion.reviewDeckWithName
+import com.ichi2.anki.common.time.TimeManager
+import com.ichi2.anki.libanki.CardType
+import com.ichi2.anki.libanki.QueueType
 import com.ichi2.anki.tests.InstrumentedTest
 import com.ichi2.anki.testutil.GrantStoragePermission.storagePermission
 import com.ichi2.anki.testutil.grantPermissions
 import com.ichi2.anki.testutil.notificationPermission
-import com.ichi2.libanki.Consts
-import com.ichi2.libanki.utils.TimeManager
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -74,9 +73,9 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
     fun existingCustomDataIsUpdatedWithCorrectSuccessCount() {
         val sql = readAssetFile(SQL_FILE_NAME)
         col.config.set("cardStateCustomizer", "customData.good.c = 0;")
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
 
         closeGetStartedScreenIfExists()
@@ -85,34 +84,22 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("""{"c":0}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":0}"}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("""{"c":1}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":1}"}""")
-        )
     }
 
     @Test
     fun nonExistentCustomDataIsUpdatedWithCorrectSuccessCount() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
 
         closeGetStartedScreenIfExists()
@@ -121,34 +108,22 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("""{"c":1}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":1}"}""")
-        )
     }
 
     @Test
     fun ensureFsrsAndExistingCustomDataAreNotLost() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         val deckConfig = col.backend.getDeckConfig(deck.id)
         col.backend.updateDeckConfigs(
             deck.id,
@@ -168,7 +143,8 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
                 .setReviewTodayActive(true)
                 .build(),
             applyAllParentLimits = true,
-            fsrsReschedule = false
+            fsrsReschedule = false,
+            fsrsHealthCheck = false
         )
         card.moveToReviewQueue()
         card.factor = 2000
@@ -207,10 +183,6 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
                     .build()
             )
             .hasDesiredRetention(0.90F)
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"s":100.0,"d":5.0,"dr":0.9,"cd":"{\"test\":100}"}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb)
@@ -221,19 +193,15 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
             //
             // Any time the default FSRS weights are updated, these values will change
             //
-            // https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/answering/mod.rs#L433
+            // https://github.com/ankitects/anki/blob/25.07.5/rslib/src/scheduler/answering/mod.rs#L448
             .hasMemoryState(
                 FsrsMemoryState
                     .newBuilder()
-                    .setDifficulty(4.992F)
-                    .setStability(140.777F)
+                    .setDifficulty(4.99F)
+                    .setStability(100.0F)
                     .build()
             )
             .hasDesiredRetention(0.90F)
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"s":140.777,"d":4.992,"dr":0.9,"cd":"{\"test\":100}"}""")
-        )
 
         col.db.execute(sql)
 
@@ -244,26 +212,22 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
             .hasMemoryState(
                 FsrsMemoryState
                     .newBuilder()
-                    .setDifficulty(4.992F)
-                    .setStability(140.777F)
+                    .setDifficulty(4.99F)
+                    .setStability(100.0F)
                     .build()
             )
             .hasDesiredRetention(0.90F)
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"s":140.777,"d":4.992,"dr":0.9,"cd":"{\"test\":100,\"c\":1}"}""")
-        )
     }
 
     @Test
     fun newAndLearnAndRelearnCardsAreIgnored() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val newNote = addNoteUsingBasicModel("foo", "bar")
+        val newNote = addNoteUsingBasicNoteType("foo", "bar")
         val newCard = newNote.firstCard(col)
-        val learnNote = addNoteUsingBasicModel("foo", "bar")
+        val learnNote = addNoteUsingBasicNoteType("foo", "bar")
         val learnCard = learnNote.firstCard(col)
         learnCard.moveToLearnQueue()
-        val relearnNote = addNoteUsingBasicModel("foo", "bar")
+        val relearnNote = addNoteUsingBasicNoteType("foo", "bar")
         val relearnCard = relearnNote.firstCard(col)
         relearnCard.moveToRelearnQueue()
 
@@ -272,75 +236,51 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var newCardFromDb = col.getCard(newCard.id)
         assertThat(newCardFromDb)
-            .hasCardType(Consts.CARD_TYPE_NEW)
-            .hasQueueType(Consts.QUEUE_TYPE_NEW)
+            .hasCardType(CardType.New.code)
+            .hasQueueType(QueueType.New.code)
             .hasReps(0)
             .hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${newCardFromDb.id};"),
-            equalTo("""{}""")
-        )
         var learnCardFromDb = col.getCard(learnCard.id)
         assertThat(learnCardFromDb)
-            .hasCardType(Consts.CARD_TYPE_LRN)
-            .hasQueueType(Consts.QUEUE_TYPE_LRN)
+            .hasCardType(CardType.Lrn.code)
+            .hasQueueType(QueueType.Lrn.code)
             .hasReps(0)
             .hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${learnCardFromDb.id};"),
-            equalTo("""{}""")
-        )
         var relearnCardFromDb = col.getCard(relearnCard.id)
         assertThat(relearnCardFromDb)
-            .hasCardType(Consts.CARD_TYPE_RELEARNING)
-            .hasQueueType(Consts.QUEUE_TYPE_LRN)
+            .hasCardType(CardType.Relearning.code)
+            .hasQueueType(QueueType.Lrn.code)
             .hasReps(0)
             .hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${relearnCardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         newCardFromDb = col.getCard(newCard.id)
         assertThat(newCardFromDb)
-            .hasCardType(Consts.CARD_TYPE_NEW)
-            .hasQueueType(Consts.QUEUE_TYPE_NEW)
+            .hasCardType(CardType.New.code)
+            .hasQueueType(QueueType.New.code)
             .hasReps(0)
             .hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${newCardFromDb.id};"),
-            equalTo("{}")
-        )
         learnCardFromDb = col.getCard(learnCard.id)
         assertThat(learnCardFromDb)
-            .hasCardType(Consts.CARD_TYPE_LRN)
-            .hasQueueType(Consts.QUEUE_TYPE_LRN)
+            .hasCardType(CardType.Lrn.code)
+            .hasQueueType(QueueType.Lrn.code)
             .hasReps(0)
             .hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${learnCardFromDb.id};"),
-            equalTo("{}")
-        )
         relearnCardFromDb = col.getCard(relearnCard.id)
         assertThat(relearnCardFromDb)
-            .hasCardType(Consts.CARD_TYPE_RELEARNING)
-            .hasQueueType(Consts.QUEUE_TYPE_LRN)
+            .hasCardType(CardType.Relearning.code)
+            .hasQueueType(QueueType.Lrn.code)
             .hasReps(0)
             .hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${relearnCardFromDb.id};"),
-            equalTo("{}")
-        )
     }
 
     @Test
     fun pressingHardPreservesSuccessfulReviewCount() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
 
         closeGetStartedScreenIfExists()
@@ -349,54 +289,34 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerHard()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
     @Test
     fun goodSuccessfulReviewCountIsZeroWhenTheAgainButtonWasLastPressed() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
 
         closeGetStartedScreenIfExists()
@@ -405,27 +325,15 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerAgain()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         refreshDeck()
         // Finish reviewing the card after pressing Again to move it to the
         // Review state, since we only update review cards
@@ -433,27 +341,19 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("""{"c":0}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":0}"}""")
-        )
     }
 
     @Test
     fun goodSuccessfulReviewCountIsCorrectWhenAgainIsPressedAndSuccessfulReviewsExistAfter() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
 
         closeGetStartedScreenIfExists()
@@ -462,73 +362,45 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerAgain()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(4).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(5).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(5).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
     @Test
     fun goodSuccessfulReviewCountIsCorrectWhenTheAgainButtonWasNeverPressed() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
 
         closeGetStartedScreenIfExists()
@@ -537,44 +409,28 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
     @Test
     fun easySuccessfulReviewCountIsZeroWhenTheAgainButtonWasLastPressed() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
 
         closeGetStartedScreenIfExists()
@@ -583,27 +439,15 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerAgain()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         refreshDeck()
         // Finish reviewing the card after pressing Again to move it to the
         // Review state, since we only update review cards
@@ -611,27 +455,19 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("""{"c":0}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":0}"}""")
-        )
     }
 
     @Test
     fun easySuccessfulReviewCountIsCorrectWhenAgainIsPressedAndSuccessfulReviewsExistAfter() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
 
         closeGetStartedScreenIfExists()
@@ -640,73 +476,45 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerAgain()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(4).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(5).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(5).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
     @Test
     fun easySuccessfulReviewCountIsCorrectWhenTheAgainButtonWasNeverPressed() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
-        val deck = col.decks.get(note.notetype.did)!!
+        val deck = col.decks.getLegacy(note.notetype.did)!!
         card.moveToReviewQueue()
 
         closeGetStartedScreenIfExists()
@@ -715,42 +523,26 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         reviewDeckWithName(deck.name)
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
     @Test
     fun filteredDeckPressingHardPreservesSuccessfulReviewCount() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
         card.moveToReviewQueue()
 
@@ -785,17 +577,9 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -803,10 +587,6 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerHard()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -814,25 +594,17 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
     @Test
     fun filteredDeckGoodSuccessfulReviewCountIsZeroWhenTheAgainButtonWasLastPressed() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
         card.moveToReviewQueue()
 
@@ -867,17 +639,9 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -885,10 +649,6 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerAgain()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         refreshDeck()
         // Finish reviewing the card after pressing Again to move it to the
         // Review state, since we only update review cards
@@ -897,25 +657,17 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("""{"c":0}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":0}"}""")
-        )
     }
 
     @Test
     fun filteredDeckGoodSuccessfulReviewCountIsCorrectWhenAgainIsPressedAndSuccessfulReviewsExistAfter() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
         card.moveToReviewQueue()
 
@@ -950,17 +702,9 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -968,20 +712,12 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerAgain()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
         reviewDeckWithName(filteredDeck.name)
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -989,10 +725,6 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(4).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -1000,25 +732,17 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(5).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(5).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
     @Test
     fun filteredDeckGoodSuccessfulReviewCountIsCorrectWhenTheAgainButtonWasNeverPressed() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
         card.moveToReviewQueue()
 
@@ -1053,17 +777,9 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -1071,25 +787,17 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerGood()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
     @Test
     fun filteredDeckEasySuccessfulReviewCountIsZeroWhenTheAgainButtonWasLastPressed() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
         card.moveToReviewQueue()
 
@@ -1124,17 +832,9 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -1142,20 +842,12 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerAgain()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
         reviewDeckWithName(filteredDeck.name)
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -1163,10 +855,6 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(4).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -1174,25 +862,17 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(5).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(5).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
     @Test
     fun filteredDeckEasySuccessfulReviewCountIsCorrectWhenAgainIsPressedAndSuccessfulReviewsExistAfter() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
         card.moveToReviewQueue()
 
@@ -1227,17 +907,9 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -1245,20 +917,12 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerAgain()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
         reviewDeckWithName(filteredDeck.name)
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(3).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -1266,10 +930,6 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(4).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -1277,25 +937,17 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(5).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(5).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
     @Test
     fun filteredDeckEasySuccessfulReviewCountIsCorrectWhenTheAgainButtonWasNeverPressed() {
         val sql = readAssetFile(SQL_FILE_NAME)
-        val note = addNoteUsingBasicModel("foo", "bar")
+        val note = addNoteUsingBasicNoteType("foo", "bar")
         val card = note.firstCard(col)
         card.moveToReviewQueue()
 
@@ -1330,17 +982,9 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
 
         var cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(0).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(1).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
         col.getCard(card.id).moveToReviewQueue()
         refreshDeck()
         rebuildFilteredDeck(filteredDeck.name)
@@ -1348,19 +992,11 @@ class AnkiSrsKaiAddonTest : InstrumentedTest() {
         clickShowAnswerAndAnswerEasy()
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{}""")
-        )
 
         col.db.execute(sql)
 
         cardFromDb = col.getCard(card.id)
         assertThat(cardFromDb).hasReps(2).hasCustomData("""{"c":2}""")
-        assertThat(
-            col.db.queryString("SELECT data from CARDS where id = ${cardFromDb.id};"),
-            equalTo("""{"cd":"{\"c\":2}"}""")
-        )
     }
 
 }

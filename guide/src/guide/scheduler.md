@@ -26,16 +26,16 @@ scheduler: {
     enableFuzz: true,
     maximumInterval: 36500,
     intervalModifier: 1.00,
-    // Approximation of the default FSRS-5 parameters
-    // [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046, 1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315, 2.9898, 0.51655, 0.6621]
+    // Approximation of the default FSRS-6 parameters
+    // [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
     calculateHardMultiplier: (currentEaseFactor, currentInterval) => {
-        return currentEaseFactor * Math.pow(currentInterval, -0.013242011) + (-1.048236196);
+        return currentEaseFactor * Math.pow(currentInterval, -0.077098162) + (0.144440985);
     },
     calculateGoodMultiplier: (currentEaseFactor, currentInterval) => {
-        return currentEaseFactor * Math.pow(currentInterval, -0.154370758) + (1.395807731);
+        return currentEaseFactor * Math.pow(currentInterval, -0.182458510) + (1.779479164);
     },
     calculateEasyMultiplier: (currentEaseFactor, currentInterval) => {
-        return currentEaseFactor * Math.pow(currentInterval, -0.178728777) + (5.295133129);
+        return currentEaseFactor * Math.pow(currentInterval, -0.183552566) + (3.407921198);
     },
 },
 ```
