@@ -7,10 +7,14 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [25.8.0] - 2025-08-16
+
 ### Changed
 
-- Update AnkiDroid integration test suite to use AnkiDroid v2.20.1 with Anki
-backend 24.11.
+- Update scheduler to Anki 25.07.5.
+- Update FSRS to SM-2 Jupyter notebook to use FSRS-6.
+- Update AnkiDroid integration test suite to use AnkiDroid v2.22.3 with Anki
+backend 25.07.5.
 
 ## [24.12.0] - 2024-12-27
 

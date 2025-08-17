@@ -6,7 +6,7 @@ members = ["anki_srs_kai", "xtask"]
 lto = true
 
 [workspace.package]
-version = "24.12.0"
+version = "25.8.0"
 edition = "2021"
 authors = ["kuroahna"]
 repository = "https://github.com/kuroahna/anki_srs_kai"

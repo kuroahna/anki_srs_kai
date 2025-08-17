@@ -1,12 +1,12 @@
 use serde::Deserialize;
 
 // These structs have mainly been constructed by the protobuf messages defined
-// in Anki: https://github.com/ankitects/anki/blob/24.11/proto/anki/scheduler.proto#L74
+// in Anki: https://github.com/ankitects/anki/blob/25.07.5/proto/anki/scheduler.proto#L78
 //
 // However, to modify the custom data, we actually need to modify the customData
 // that gets passed in to the custom scheduler separately, rather than on the
 // SchedulingState itself
-// See: https://github.com/ankitects/anki/blob/24.11/ts/reviewer/answering.ts#L63
+// See: https://github.com/ankitects/anki/blob/25.07.5/ts/reviewer/answering.ts#L63
 //
 // Unfortunately, wasm-bindgen is not yet supported for prost, so we have to
 // manually write the structs ourselves
@@ -189,7 +189,7 @@ pub mod javascript {
     extern "C" {
         #[derive(Clone)]
         pub type SchedulingStates;
-        #[wasm_bindgen(thread_local, js_name = states)]
+        #[wasm_bindgen(thread_local_v2, js_name = states)]
         pub static STATES: SchedulingStates;
 
         #[wasm_bindgen(method, getter, js_name = hard)]
@@ -207,7 +207,7 @@ pub mod javascript {
         #[derive(Clone)]
         pub type SchedulingContext;
 
-        #[wasm_bindgen(thread_local, js_name = ctx)]
+        #[wasm_bindgen(thread_local_v2, js_name = ctx)]
         pub static CONTEXT: SchedulingContext;
 
         #[wasm_bindgen(method, getter, js_name = deckName)]
@@ -217,11 +217,11 @@ pub mod javascript {
         //
         // They call
         // (card_id.0 as u64).wrapping_add(card_reps as u64)
-        // https://github.com/ankitects/anki/blob/24.11/rslib/src/scheduler/answering/mod.rs#L612
+        // https://github.com/ankitects/anki/blob/25.07.5/rslib/src/scheduler/answering/mod.rs#L644
         //
         // But we actually get
         // (self.id.0 as u64).rotate_left(8).wrapping_add(self.reps as u64)
-        // https://github.com/ankitects/anki/blob/24.11/rslib/src/card/mod.rs#L257
+        // https://github.com/ankitects/anki/blob/25.07.5/rslib/src/card/mod.rs#L273
         #[wasm_bindgen(method, getter, js_name = seed)]
         pub fn seed(this: &SchedulingContext) -> u64;
     }
@@ -230,7 +230,7 @@ pub mod javascript {
     extern "C" {
         #[derive(Clone)]
         pub type CustomDataStates;
-        #[wasm_bindgen(thread_local, js_name = customData)]
+        #[wasm_bindgen(thread_local_v2, js_name = customData)]
         pub static CUSTOM_DATA: CustomDataStates;
 
         #[wasm_bindgen(method, getter, js_name = again)]
@@ -253,7 +253,7 @@ pub mod javascript {
         // Custom data key names must be under 8 bytes (8 ASCII characters), so
         // we cannot provide more descriptive names. Also, the serialized JSON
         // must be under 100 bytes.
-        // See: https://github.com/ankitects/anki/blob/24.11/rslib/src/storage/card/data.rs#L119-L133
+        // See: https://github.com/ankitects/anki/blob/25.07.5/rslib/src/storage/card/data.rs#L135-L149
         #[wasm_bindgen(method, getter, js_name = c)]
         pub fn c(this: &CustomDataState) -> Option<u32>;
 

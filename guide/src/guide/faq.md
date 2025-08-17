@@ -4,9 +4,9 @@
 
 Anki SRS Kai is supported on the following platforms
 
-* Anki Desktop (Windows, Mac, Linux): 24.11+
-* AnkiDroid (Android): 2.20.0+
-* AnkiMobile (iOS): 24.11+
+* Anki Desktop (Windows, Mac, Linux): 25.07+
+* AnkiDroid (Android): 2.22.3+
+* AnkiMobile (iOS): 25.07+
 
 **IMPORTANT:** AnkiWeb is **not** supported. There is no technical limitation
 as [WebAssembly is supported](https://caniuse.com/wasm) by every major browser.

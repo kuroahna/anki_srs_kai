@@ -6,7 +6,7 @@ factor and current interval of the card, allows us to approximate FSRS's
 stability increase function with a simple power function.
 
 According to the [FSRS
-algorithm](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/7225d0832246b312f3b7112b25b171bc10efbbbe), 
+algorithm](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c), 
 the new stability after successful review is calculated as
 \\[
 S^\prime_r(D,S,R,G) = S \cdot (e^{w_8} \cdot (11-D) \cdot S^{-w_9} \cdot (e^{w_{10}\cdot(1-R)}-1) \cdot w_{15}(\textrm{if G = 2}) \cdot w_{16}(\textrm{if G = 4}) + 1)
@@ -41,7 +41,7 @@ in the Anki SM-2 next interval function
 **IMPORTANT**: If you do not have many reviews for the optimizer to train on, or
 you have previously used Anki incorrectly, such as pressing the Hard button
 instead of the Again button to fail a card, it is recommended to use the default
-FSRS-5 parameters until your review history is large enough for optimization.
+FSRS-6 parameters until your review history is large enough for optimization.
 
 First, retrieve your optimized FSRS parameters. This can be done either by
 
@@ -101,9 +101,9 @@ To convert your optimized FSRS parameters to SM-2
 For example, with the FSRS-5 default parameters and default Anki SM-2 settings,
 
 ```python
-parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
-              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
-              2.9898, 0.51655, 0.6621]
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
 starting_ease = 2.5
 desired_retention = 0.90
 ```
@@ -126,8 +126,8 @@ is best to set the Graduating interval to the one you most often use
 
 Graduating interval (again): 0
 Graduating interval (hard): 1
-Graduating interval (good): 3
-Easy interval: 16
+Graduating interval (good): 2
+Easy interval: 8
 
 
 Replace the scheduler settings for your deck in the Custom scheduling field in
@@ -138,16 +138,13 @@ scheduler: {
     // ... (other settings)
     intervalModifier: 1.0,
     calculateHardMultiplier: (currentEaseFactor, currentInterval) => {
-        return currentEaseFactor * Math.pow(currentInterval, -0.013242011) +
-(-1.048236196);
+        return currentEaseFactor * Math.pow(currentInterval, -0.077098162) + (0.144440985);
     },
     calculateGoodMultiplier: (currentEaseFactor, currentInterval) => {
-        return currentEaseFactor * Math.pow(currentInterval, -0.154370758) +
-(1.395807731);
+        return currentEaseFactor * Math.pow(currentInterval, -0.182458510) + (1.779479164);
     },
     calculateEasyMultiplier: (currentEaseFactor, currentInterval) => {
-        return currentEaseFactor * Math.pow(currentInterval, -0.178728777) +
-(5.295133129);
+        return currentEaseFactor * Math.pow(currentInterval, -0.183552566) + (3.407921198);
     },
 },
 ```
@@ -174,7 +171,7 @@ Follow the instructions in the Jupyter notebook output as shown above.
 ## Fine tuning the parameters
 
 Assuming the Good button is pressed for each review, we can
-[graph](https://www.desmos.com/calculator/wn9smg19qs) the functions \\(SInc\\)
+[graph](https://www.desmos.com/calculator/comgwaxi4y) the functions \\(SInc\\)
 and `calculateGoodMultiplier` (similar graphs can be created for the Hard and
 Easy buttons).
 

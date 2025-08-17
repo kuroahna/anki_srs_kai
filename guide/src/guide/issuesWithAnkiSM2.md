@@ -59,18 +59,18 @@ learning card becomes a review card.
 According to [SuperMemo](https://supermemo.guru/wiki/Optimum_interval),
 > The first optimum interval for review at retrievability of 90% is 3.96 days.
 
-Additionally, FSRS [benchmarked](https://github.com/open-spaced-repetition/srs-benchmark/blob/bb552316d128bcd6fdc61862e557408979ca983f/README.md)
+Additionally, FSRS [benchmarked](https://github.com/open-spaced-repetition/srs-benchmark/blob/45f61b2182c27da83839383ec3b044fa5ae27b47/README.md)
 the accuracy of several SRS algorithms on a dataset of roughly 10,000 users.
-FSRS-5 has a very high accuracy rate and was trained on a dataset of
-approximately 20,000 Anki users, which resulted in the default parameters:
+FSRS-6 has a very high accuracy rate and was trained on a dataset of
+approximately 10,000 Anki users, which resulted in the default parameters:
 
 \\[
-w = [0.40255, 1.18385, 3.173, 15.69105, \cdots]
+w = [0.212, 1.2931, 2.3065, 8.2956, \cdots]
 \\]
 
 The optimal first interval for review at retrievability of 90% when pressing
-Good for a new card for the first rating is 3.173 days. Visit the [FSRS
-algorithm](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/7225d0832246b312f3b7112b25b171bc10efbbbe)
+Good for a new card for the first rating is 2.3065 days. Visit the [FSRS
+algorithm](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c)
 for more details.
 
 By setting the Graduating Interval to 1, the user is reviewing at a nonoptimal
@@ -86,7 +86,7 @@ According to [SuperMemo](https://supermemo.guru/wiki/Stabilization),
 > **The higher the stability, the lesser the stability increase at review.**
 
 Additionally, according to
-[FSRS](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/7225d0832246b312f3b7112b25b171bc10efbbbe),
+[FSRS](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c),
 > **The larger the value of S, the smaller the SInc value.** This means that the
 > higher the stability of the memory, the harder it becomes to make the memory
 > even more stable.

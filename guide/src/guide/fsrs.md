@@ -9,14 +9,14 @@ instead of modifying SM-2 settings such as [Graduating
 interval](https://docs.ankiweb.net/deck-options.html#graduating-interval), [Easy
 bonus](https://docs.ankiweb.net/deck-options.html#easy-bonus), etc.
 
-Additionally, the default FSRS-5 parameters are also better than SM-2 for 99.0%
+Additionally, the default FSRS-6 parameters are also better than SM-2 for 99.5%
 of users according to the
-[benchmarks](https://github.com/open-spaced-repetition/srs-benchmark/blob/bb552316d128bcd6fdc61862e557408979ca983f/README.md),
+[benchmarks](https://github.com/open-spaced-repetition/srs-benchmark/blob/45f61b2182c27da83839383ec3b044fa5ae27b47/README.md),
 which is benchmarked on approximately 10,000 Anki users.
 
 However, some users are reluctant to make the switch because they would still
 like full control of the SM-2 scheduling algorithm compared to the [FSRS
-algorithm](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/7225d0832246b312f3b7112b25b171bc10efbbbe)
+algorithm](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c)
 where the desired retention setting is the main configurable parameter, and
 directly modifying the FSRS parameters is generally not advisible since it has
 already been optimized to the user's review history.
@@ -46,8 +46,8 @@ equal to 1 day and hence stick with the default Anki SM-2 algorithm.
 
 ## Ease Hell
 
-FSRS-5 addresses Ease Hell (ie, Difficulty Hell) by applying [mean
-reversion](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/7225d0832246b312f3b7112b25b171bc10efbbbe)
+FSRS-6 addresses Ease Hell (ie, Difficulty Hell) by applying [mean
+reversion](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c)
 to the new difficulty value after review. This implies that a card's difficulty
 would converge to the average difficulty over time.
 
@@ -81,11 +81,12 @@ D'          &= D + \Delta D \cdot \frac{10 - D}{9}
 \end{align}
 \\]
 
-And the default parameters for FSRS-5 is
+And the default parameters for FSRS-6 is
 
 ```
-w = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046, 1.54575,
-0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315, 2.9898, 0.51655, 0.6621]
+w = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722,
+0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912,
+0.0658, 0.1542]
 ```
 
 Suppose we have an extremely difficult card where \\(D = 10\\), and we always
@@ -100,12 +101,12 @@ D'' &= w_7 \cdot D_0(4) + (1 - w_7) \cdot D' \\\\
     &= w_7 \cdot D_0(4) + (1 - w_7) \cdot (10 + (-w_6 \cdot 0) \cdot 0) \\\\
     &= w_7 \cdot D_0(4) + (1 - w_7) \cdot 10 \\\\
     &= w_7 \cdot (w_4 - e^{w_5 \cdot 3} + 1) + (1 - w_7) \cdot 10 \\\\
-    &= w_7 \cdot (7.1949 - e^{0.5345 \cdot 3} + 1) + (1 - w_7) \cdot 10 \\\\
-    &= w_7 \cdot 3.224501589 + (1 - w_7) \cdot 10 \\\\
-    &= 0.0046 \cdot 3.224501589 + (1 - 0.0046) \cdot 10 \\\\
-    &= 0.0046 \cdot 3.224501589 + 0.9954 \cdot 10 \\\\
-    &= 0.014832707 + 9.954 \\\\
-    &= 9.968832707 \\\\
+    &= w_7 \cdot (6.4133 - e^{0.8334 \cdot 3} + 1) + (1 - w_7) \cdot 10 \\\\
+    &= w_7 \cdot −4.771630703 + (1 - w_7) \cdot 10 \\\\
+    &= 0.001 \cdot −4.771630703 + (1 - 0.001) \cdot 10 \\\\
+    &= 0.001 \cdot −4.771630703 + 0.999 \cdot 10 \\\\
+    &= −0.004771631 + 9.99 \\\\
+    &= 9.985228369 \\\\
 \end{align}
 \\]
 
@@ -116,16 +117,16 @@ We can calculate this automatically by using some code.
         only pressing the Good button</summary>
 
 ```
-pip install --quiet fsrs==4.1.1
+pip install --quiet fsrs==6.1.1
 ```
 
 ```python
 import fsrs
 
 
-parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
-              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
-              2.9898, 0.51655, 0.6621]
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
 desired_retention = 0.90
 
 
@@ -140,30 +141,30 @@ difficulty = 10.0
 target_difficulty = 9
 print(f"target difficulty: {target_difficulty}")
 while difficulty >= target_difficulty:
-        difficulty = scheduler._next_difficulty(difficulty, fsrs.Rating.Good)
+        difficulty = scheduler._next_difficulty(difficulty=difficulty, rating=fsrs.Rating.Good)
         n += 1
         print(f"{n}: {difficulty}")
 ```
 
 ```
 target difficulty: 9
-1: 9.968832707311106
-2: 9.937808784168583
-3: 9.906927571072515
-4: 9.876188411556688
-5: 9.845590652174634
+1: 9.991
+2: 9.982009
+3: 9.973026991
+4: 9.964053964008999
+5: 9.95508991004499
 ...
-34: 9.016932809163938
-35: 8.990287625552892
+117: 9.005798073105412
+118: 8.997792275032307
 ```
 </details>
 
-We see that it takes 35 reviews pressing the Good button in a row before it
+We see that it takes 118 reviews pressing the Good button in a row before it
 reaches a difficulty of 9.
 
 Furthermore, we can calculate how many reviews it will take to go from a
 difficulty of 10 to the initial difficulty when the first rating is Easy (the
-target difficulty that every card will converge to in FSRS-5).
+target difficulty that every card will converge to in FSRS-6).
 
 <details>
 <summary>Calculate the number of times to go from a difficulty of 10 to the
@@ -171,16 +172,16 @@ target difficulty that every card will converge to in FSRS-5).
         Good button</summary>
 
 ```
-pip install --quiet fsrs==4.1.1
+pip install --quiet fsrs==6.1.1
 ```
 
 ```python
 import fsrs
 
 
-parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
-              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
-              2.9898, 0.51655, 0.6621]
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
 desired_retention = 0.90
 
 
@@ -192,24 +193,24 @@ scheduler = fsrs.Scheduler(
 
 n = 0
 difficulty = 10.0
-target_difficulty = scheduler._initial_difficulty(fsrs.Rating.Easy)
+target_difficulty = scheduler._initial_difficulty(rating=fsrs.Rating.Easy)
 print(f"target difficulty: {target_difficulty}")
 while difficulty >= target_difficulty:
-        difficulty = scheduler._next_difficulty(difficulty, fsrs.Rating.Good)
+        difficulty = scheduler._next_difficulty(difficulty=difficulty, rating=fsrs.Rating.Good)
         n += 1
         print(f"{n}: {difficulty}")
 ```
 
 ```
-target difficulty: 3.2245015893713678
-1: 9.968832707311106
-2: 9.937808784168583
-3: 9.906927571072515
-4: 9.876188411556688
-5: 9.845590652174634
+target difficulty: 1.0
+1: 9.991
+2: 9.982009
+3: 9.973026991
+4: 9.964053964008999
+5: 9.95508991004499
 ...
-6971: 3.2245015893713678
-6972: 3.2245015893713673
+6798: 1.0100099398929248
+6799: 1.0099999299530318
 ```
 </details>
 
@@ -226,16 +227,16 @@ The effects of having a difficult card can be calculated with the code below.
         10.0</summary>
 
 ```
-pip install --quiet fsrs==4.1.1
+pip install --quiet fsrs==6.1.1
 ```
 
 ```python
 import fsrs
 
 
-parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
-              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
-              2.9898, 0.51655, 0.6621]
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
 desired_retention = 0.90
 
 difficulty = 10.0
@@ -248,40 +249,40 @@ scheduler = fsrs.Scheduler(
     maximum_interval = 36500,
 )
 
-next_stability = scheduler._next_stability(difficulty, stability, retrievability, fsrs.Rating.Good)
-next_interval = scheduler._next_interval(next_stability)
+next_stability = scheduler._next_stability(difficulty=difficulty, stability=stability, retrievability=retrievability, rating=fsrs.Rating.Good)
+next_interval = scheduler._next_interval(stability=next_stability)
 print(f"Next recall stability: {next_stability}")
 print(f"Next interval: {next_interval}")
 ```
 
 ```
-Next recall stability: 129.07449108737947
-Next interval: 129
+Next recall stability: 125.01489980658735
+Next interval: 125
 ```
 </details>
 
 For a card with a difficulty of 10.0, stability (interval) of 100 days,
-retrievability of 90%, and desired retention of 90% using the default FSRS-5
-parameters, the next interval is 129 days.
+retrievability of 90%, and desired retention of 90% using the default FSRS-6
+parameters, the next interval is 125 days.
 
 <details>
 <summary>Calculate the next interval for a card with a difficulty of
         5.0</summary>
 
 ```
-pip install --quiet fsrs==4.1.1
+pip install --quiet fsrs==6.1.1
 ```
 
 ```python
 import fsrs
 
 
-parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
-              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
-              2.9898, 0.51655, 0.6621]
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
 desired_retention = 0.90
 
-difficulty = 10.0
+difficulty = 5.0
 stability = 100.0
 retrievability = 0.90
 
@@ -291,47 +292,47 @@ scheduler = fsrs.Scheduler(
     maximum_interval = 36500,
 )
 
-next_stability = scheduler._next_stability(difficulty, stability, retrievability, fsrs.Rating.Good)
-next_interval = scheduler._next_interval(next_stability)
+next_stability = scheduler._next_stability(difficulty=difficulty, stability=stability, retrievability=retrievability, rating=fsrs.Rating.Good)
+next_interval = scheduler._next_interval(stability=next_stability)
 print(f"Next recall stability: {next_stability}")
 print(f"Next interval: {next_interval}")
 ```
 
 ```
-Next recall stability: 274.44694652427677
-Next interval: 274
+Next recall stability: 250.08939883952408
+Next interval: 250
 ```
 </details>
 
 In contrast, for a card with a difficulty of 5.0, stability (interval) of 100
 days, retrievability of 90%, and desired retention of 90% using the default
-FSRS-5 parameters, the next interval is 274 days.
+FSRS-6 parameters, the next interval is 250 days.
 
 In this case, the card with a difficulty of 10.0 has its interval reduced by
-2.1x compared to the card with a difficulty of 5.0. This is an issue because if
+2x compared to the card with a difficulty of 5.0. This is an issue because if
 a card was previously difficult, but became easier via increased repetitions and
 better memory encoding of the material, then the user will be doing more reviews
 than necessary, resulting in an **increased workload**.
 
-Additionally, with the default FSRS-5 parameters, a card with a difficulty of
-5.0 only takes pressing the Again button 5 times before it reaches a difficulty
-of 9.23.
+Additionally, with the default FSRS-6 parameters, a card with a difficulty of
+5.0 only takes pressing the Again button 2 times before it reaches a difficulty
+of 9.45.
 
 <details>
 <summary>Calculate the number of times to go from a difficulty of 5 to
         9</summary>
 
 ```
-pip install --quiet fsrs==4.1.1
+pip install --quiet fsrs==6.1.1
 ```
 
 ```python
 import fsrs
 
 
-parameters = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046,
-              1.54575, 0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315,
-              2.9898, 0.51655, 0.6621]
+parameters = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+              1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+              1.8729, 0.5425, 0.0912, 0.0658, 0.1542]
 desired_retention = 0.90
 
 
@@ -346,29 +347,26 @@ difficulty = 5
 target_difficulty = 9
 print(f"target difficulty: {target_difficulty}")
 while difficulty <= target_difficulty:
-        difficulty = scheduler._next_difficulty(difficulty, fsrs.Rating.Again)
+        difficulty = scheduler._next_difficulty(difficulty=difficulty, rating=fsrs.Rating.Again)
         n += 1
         print(f"{n}: {difficulty}")
 ```
 
 ```
 target difficulty: 9
-1: 6.607035107311108
-2: 7.687540460685953
-3: 8.414028521438494
-4: 8.902489685251803
-5: 9.230911198891961
+1: 8.347534
+2: 9.447845662568799
 ```
 </details>
 
-This scenario is not limited to pressing the Again button 5 times in a row. It
+This scenario is not limited to pressing the Again button 2 times in a row. It
 is possible to enter Difficulty Hell with the Again -> Good -> Again -> Good
 loop. If \\(w_7\\) is close to 0, it will take many reviews pressing the Good
 button before the card exits Difficulty Hell.
 
 Whether the mean reversion in FSRS or the Straight Rewards addon for SM-2 is
-actually effective is still under research, but given that FSRS-5 is optimized
-on the review history of 20,000 users and found that \\(w_7\\) to be near
+actually effective is still under research, but given that FSRS-6 is optimized
+on the review history of 10,000 users and found that \\(w_7\\) to be near
 \\(0\\) seems to indicate that it is not as effective as one may hope. However,
 with Straight Rewards, it is possible for a card to exit Ease Hell (Difficulty
 Hell) much quicker with user defined values.
@@ -402,7 +400,7 @@ card will take a long time to exit difficulty hell.
 
 ## Short intervals for new cards
 
-FSRS-5 addresses the short intervals for new cards issue by optimizing on a
+FSRS-6 addresses the short intervals for new cards issue by optimizing on a
 user's collection and determining the best initial stability (interval when
 retrievability is 90%) for each rating (Again, Hard, Good, and Easy). That is,
 the initial stability after the first rating is calculated as
@@ -417,18 +415,19 @@ Easy button.
 
 With the default parameters,
 ```
-w = [0.40255, 1.18385, 3.173, 15.69105, 7.1949, 0.5345, 1.4604, 0.0046, 1.54575,
-0.1192, 1.01925, 1.9395, 0.11, 0.29605, 2.2698, 0.2315, 2.9898, 0.51655, 0.6621]
+w = [0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722,
+0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912,
+0.0658, 0.1542]
 ```
 
 we have
 
 \\[
 \begin{align}
-S_0(1) &= 0.40255 \\\\
-S_0(2) &= 1.18385 \\\\
-S_0(3) &= 3.173 \\\\
-S_0(4) &= 15.69105 \\\\
+S_0(1) &= 0.212 \\\\
+S_0(2) &= 1.2931 \\\\
+S_0(3) &= 2.3065 \\\\
+S_0(4) &= 8.2956 \\\\
 \end{align}
 \\]
 
@@ -437,7 +436,7 @@ will determine the card's interval when it graduates to a review card.
 
 For example, for a deck with learning steps `1m 10m` and the first rating is
 Good on the first learning step of `1m`, then when the card has graduated, it
-will have an interval of 3 days (rounded down from 3.173).
+will have an interval of 2 days (rounded down from 2.3065).
 
 There is no direct equivalent in Anki SM-2 for this behaviour, but the closest
 is the [Graduating
@@ -446,7 +445,7 @@ interval](https://docs.ankiweb.net/deck-options.html#graduating-interval) and
 
 ## Long intervals for mature cards
 
-FSRS-5 addresses the long intervals for mature cards issue with the following
+FSRS-6 addresses the long intervals for mature cards issue with the following
 formula
 
 \\[
@@ -454,7 +453,7 @@ S^\prime_r(D,S,R,G) = S \cdot (e^{w_8} \cdot (11-D) \cdot S^{-w_9} \cdot (e^{w_{
 \\]
 
 According to the [FSRS algorithm
-wiki](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/7225d0832246b312f3b7112b25b171bc10efbbbe|),
+wiki](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm/e6ded59fa6d1d6bb2950a759d53b14575e9e586c),
 
 > Let \\(SInc\\) (the increase in stability) denotes \\(\frac{S^{'}_{r}(D, S,
 > R, G)}{S}\\) which is equivalent to Anki's ease factor.
@@ -475,12 +474,12 @@ handling cards that are past its due date or reviewed early. In particular, the
 retrievability of a card is calculated as 
 
 \\[
-R(t, S) = \left( 1 + FACTOR \cdot \frac{t}{S} \right)^{DECAY}
+R(t, S) = \left( 1 + factor \cdot \frac{t}{S} \right)^{-w_{20}}
 \\]
 
 where \\(t\\) is the number of days since the last review, \\(S\\) is the
-stability (interval when probability of recall is 90%), \\(DECAY = -0.5\\), and
-\\(FACTOR = \frac{19}{81}\\).
+stability (interval when probability of recall is 90%), and
+\\(factor = 0.9^{-\frac{1}{w_{20}}} - 1\\).
 
 In other words, FSRS can accurately predict the retrievability of a card when it
 is reviewed, whether it is early or late. In contrast, Anki SM-2 does not
@@ -506,14 +505,13 @@ e^{w\_{14} \cdot (1 - R)}
 \\]
 
 For example, if a card has an interval of \\(S = 1000\\) days with \\( D = 5 \\)
-and \\( R = 0.9 \\) and default FSRS-5 parameters \\(w = [ \cdots, 1.9395, 0.11,
-0.29605, 2.2698 \cdots ]\\), then
+and \\( R = 0.9 \\) and default FSRS-6 parameters \\(w = [ \cdots, 1.4835, 0.0614, 0.2629, 1.6483, \cdots ]\\), then
 
 \\[
 \begin{align}
-S'\_{f}(5,1000,0.9) &= 1.9395 \cdot 5^{-0.11} \cdot ((1000+1)^{0.29605} - 1) \cdot
-e^{2.2698 \cdot (1 - 0.9)} \\\\
-&\approx 13.72
+S'\_{f}(5,1000,0.9) &= 1.4835 \cdot 5^{-0.0614} \cdot ((1000+1)^{0.2629} - 1) \cdot
+e^{1.6483 \cdot (1 - 0.9)} \\\\
+&\approx 8.16
 \end{align}
 \\]
 
@@ -556,7 +554,7 @@ behaviour off, this is generally not recommended for the same reasons above in
 the [Ease Hell](#ease-hell) section
 
 The SuperMemo and [FSRS
-benchmark](https://github.com/open-spaced-repetition/srs-benchmark/blob/bb552316d128bcd6fdc61862e557408979ca983f/README.md) data
+benchmark](https://github.com/open-spaced-repetition/srs-benchmark/blob/45f61b2182c27da83839383ec3b044fa5ae27b47/README.md) data
 currently conflict as to which is the best approach here, and more research is
 most likely required before a conclusion can be drawn.
 
